@@ -11,7 +11,7 @@ import java.util.Comparator;
  *
  * @author eric
  */
-public class ComparatorChain<T> implements Comparator<T> {
+class ComparatorChain<T> implements Comparator<T> {
   
   private final Comparator<T>[] comparators;
 

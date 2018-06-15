@@ -38,12 +38,12 @@ import javax.imageio.ImageIO;
  */
 public class EvolutionImageSaverListener<G extends ConstrainedSequence, T, F extends Fitness> extends AbstractListener<G, T, F> implements WithConstants {
 
-  public static enum ImageType {
+  public enum ImageType {
     DIVERSITY,
     USAGE,
     DU,
     BEST_USAGE
-  };
+  }
 
   private final Map<String, Object> constants;
   private final String basePath;
@@ -74,38 +74,38 @@ public class EvolutionImageSaverListener<G extends ConstrainedSequence, T, F ext
     //update best usages
     Individual<G, T, F> best = rankedPopulation.get(0).get(0);
     if (types.contains(ImageType.BEST_USAGE)) {
-      double[] bestUsages = new double[best.getGenotype().size()];
-      int[] bitUsages = (int[]) best.getOtherInfo().get(StandardGEMapper.BIT_USAGES_INDEX_NAME);
+      double[] bestUsages = new double[best.genotype.size()];
+      int[] bitUsages = (int[]) best.otherInfo.get(StandardGEMapper.BIT_USAGES_INDEX_NAME);
       if (bitUsages != null) {
         double maxUsage = 0;
         for (int bitUsage : bitUsages) {
-          maxUsage = Math.max(maxUsage, (double) bitUsage);
+          maxUsage = Math.max(maxUsage, bitUsage);
         }
         for (int i = 0; i < Math.min(bitUsages.length, bestUsages.length); i++) {
-          bestUsages[i] = (double) bitUsages[i] / maxUsage;
+          bestUsages[i] = bitUsages[i] / maxUsage;
         }
       }
       evolutionBestUsages.add(bestUsages);
     }
     //update diversities
     if (types.contains(ImageType.DIVERSITY) || types.contains(ImageType.DU)) {
-      Set[] domains = new Set[best.getGenotype().size()];
-      Multiset[] symbols = new Multiset[best.getGenotype().size()];
+      Set[] domains = new Set[best.genotype.size()];
+      Multiset[] symbols = new Multiset[best.genotype.size()];
       for (int i = 0; i < symbols.length; i++) {
         symbols[i] = HashMultiset.create();
         domains[i] = new LinkedHashSet();
       }
-      double[] counts = new double[best.getGenotype().size()];
+      double[] counts = new double[best.genotype.size()];
       for (List<Individual<G, T, F>> rank : rankedPopulation) {
         for (Individual<G, T, F> individual : rank) {
-          for (int i = 0; i < Math.min(best.getGenotype().size(), individual.getGenotype().size()); i++) {
+          for (int i = 0; i < Math.min(best.genotype.size(), individual.genotype.size()); i++) {
             counts[i] = counts[i] + 1;
-            symbols[i].add(individual.getGenotype().get(i));
-            domains[i].addAll(individual.getGenotype().domain(i));
+            symbols[i].add(individual.genotype.get(i));
+            domains[i].addAll(individual.genotype.domain(i));
           }
         }
       }
-      double[] diversities = new double[best.getGenotype().size()];
+      double[] diversities = new double[best.genotype.size()];
       for (int i = 0; i < symbols.length; i++) {
         diversities[i] = Utils.multisetDiversity(symbols[i], domains[i]);
       }
@@ -113,18 +113,18 @@ public class EvolutionImageSaverListener<G extends ConstrainedSequence, T, F ext
     }
     //update usages
     if (types.contains(ImageType.USAGE) || types.contains(ImageType.DU)) {
-      double[] usages = new double[best.getGenotype().size()];
+      double[] usages = new double[best.genotype.size()];
       double count = 0;
       for (List<Individual<G, T, F>> rank : rankedPopulation) {
         for (Individual<G, T, F> individual : rank) {
-          int[] bitUsages = (int[]) individual.getOtherInfo().get(StandardGEMapper.BIT_USAGES_INDEX_NAME);
+          int[] bitUsages = (int[]) individual.otherInfo.get(StandardGEMapper.BIT_USAGES_INDEX_NAME);
           if (bitUsages != null) {
             double maxUsage = 0;
             for (int bitUsage : bitUsages) {
-              maxUsage = Math.max(maxUsage, (double) bitUsage);
+              maxUsage = Math.max(maxUsage, bitUsage);
             }
             for (int i = 0; i < Math.min(bitUsages.length, usages.length); i++) {
-              usages[i] = usages[i] + (double) bitUsages[i] / maxUsage;
+              usages[i] = usages[i] + bitUsages[i] / maxUsage;
             }
             count = count + 1;
           }
@@ -142,7 +142,7 @@ public class EvolutionImageSaverListener<G extends ConstrainedSequence, T, F ext
         //save
         String baseFileName = "";
         for (Object value : constants.values()) {
-          baseFileName = baseFileName + value.toString() + "-";
+          baseFileName = baseFileName + value + '-';
         }
         if (types.contains(ImageType.DIVERSITY)) {
           saveCSV(basePath + File.separator + baseFileName + "diversitiy.csv", toArray(evolutionDiversities));
@@ -184,7 +184,7 @@ public class EvolutionImageSaverListener<G extends ConstrainedSequence, T, F ext
     }
   }
 
-  private double[][] toArray(List<double[]> list) {
+  private static double[][] toArray(List<double[]> list) {
     double[][] data = new double[list.size()][];
     for (int i = 0; i < list.size(); i++) {
       data[i] = list.get(i);
@@ -192,12 +192,12 @@ public class EvolutionImageSaverListener<G extends ConstrainedSequence, T, F ext
     return data;
   }
 
-  private void saveCSV(String fileName, double[][] data) {
+  private static void saveCSV(String fileName, double[][] data) {
     try (PrintStream ps = new PrintStream(fileName)) {
-      for (int g = 0; g < data.length; g++) {
-        for (int i = 0; i < data[g].length; i++) {
-          ps.printf("%6.4f", data[g][i]);
-          if (i == data[g].length - 1) {
+      for (double[] aData: data) {
+        for (int i = 0; i < aData.length; i++) {
+          ps.printf("%6.4f", aData[i]);
+          if (i == aData.length - 1) {
             ps.println();
           } else {
             ps.print(";");
@@ -209,7 +209,7 @@ public class EvolutionImageSaverListener<G extends ConstrainedSequence, T, F ext
     }
   }
 
-  private void saveImage(String fileName, double[][]... data) {
+  private static void saveImage(String fileName, double[][]... data) {
     BufferedImage bi = new BufferedImage(data[0][0].length, data[0].length, BufferedImage.TYPE_INT_ARGB);
     for (int y = 0; y < data[0].length; y++) {
       for (int x = 0; x < data[0][y].length; x++) {

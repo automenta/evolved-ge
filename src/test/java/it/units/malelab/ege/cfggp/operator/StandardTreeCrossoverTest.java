@@ -8,6 +8,7 @@ package it.units.malelab.ege.cfggp.operator;
 import it.units.malelab.ege.cfggp.initializer.GrowTreeFactory;
 import it.units.malelab.ege.core.Grammar;
 import it.units.malelab.ege.core.Node;
+import it.units.malelab.ege.core.operator.GeneticOperator;
 import it.units.malelab.ege.util.Utils;
 import java.io.File;
 import java.io.IOException;
@@ -57,7 +58,7 @@ public class StandardTreeCrossoverTest {
     GrowTreeFactory<String> f = new GrowTreeFactory<>(maxDepth, g);
     Node<String> t1 = f.build(random);
     Node<String> t2 = f.build(random);
-    StandardTreeCrossover<String> op = new StandardTreeCrossover<>(maxDepth);
+    GeneticOperator<Node<String>> op = new StandardTreeCrossover<>(maxDepth);
     List<Node<String>> parents = new ArrayList<>();
     parents.add(t1);
     parents.add(t2);
@@ -65,8 +66,8 @@ public class StandardTreeCrossoverTest {
       Node<String> parent1 = parents.get(0);
       Node<String> parent2 = parents.get(1);
       List<Node<String>> children = op.apply(parents, random);
-      assertTrue("parent1 should remain unchanged", parent1==parents.get(0));
-      assertTrue("parent2 should remain unchanged", parent2==parents.get(1));
+      assertSame("parent1 should remain unchanged", parent1, parents.get(0));
+      assertSame("parent2 should remain unchanged", parent2, parents.get(1));
       if (children!=null) {
         assertEquals("there should be 2 children", 2, children.size());
         assertTrue("child1 depth should be <="+maxDepth, children.get(0).depth()<=maxDepth);

@@ -16,7 +16,6 @@ import it.units.malelab.ege.cfggp.initializer.GrowTreeFactory;
 import it.units.malelab.ege.cfggp.mapper.CfgGpMapper;
 import it.units.malelab.ege.cfggp.operator.StandardTreeCrossover;
 import it.units.malelab.ege.cfggp.operator.StandardTreeMutation;
-import it.units.malelab.ege.core.Individual;
 import it.units.malelab.ege.core.Node;
 import it.units.malelab.ege.core.Problem;
 import it.units.malelab.ege.core.evolver.Evolver;
@@ -141,24 +140,24 @@ public class MapperGenerationExperimenter {
     //baselines.clear(); //TODO remove to show baselines performance
     boolean validationHeader = true;
     boolean mainHeader = true;
-    for (String baselineName : baselines.keySet()) {
-      MultiObjectiveFitness moF = problem.getLearningFitnessComputer().compute(baselines.get(baselineName));
+    for (Map.Entry<String, Node<String>> stringNodeEntry: baselines.entrySet()) {
+      MultiObjectiveFitness moF = problem.getLearningFitnessComputer().compute(stringNodeEntry.getValue());
       System.out.printf("%5.5s fitness:\t" + join(rep("%4.2f", properties.length), " ") + "%n",
-              join(a(baselineName), moF.getValue())
+              join(a(stringNodeEntry.getKey()), moF.getValue())
       );
-      for (String validationProblemName : validationProblems.keySet()) {
+      for (Map.Entry<String, Problem<String, NumericFitness>> stringProblemEntry: validationProblems.entrySet()) {
         for (int r = 0; r < validationRuns; r++) {
           Pair<Node<String>, NumericFitness> best = applyMapperOnProblem(
-                  baselines.get(baselineName),
-                  validationProblems.get(validationProblemName),
+                  stringNodeEntry.getValue(),
+                  stringProblemEntry.getValue(),
                   validationPopSize, validationGenotypeSize, validationGenerations, validationMaxMappingDepth, expressivenessDepth,
-                  baselineName, r, validationProblemName,
+                  stringNodeEntry.getKey(), r, stringProblemEntry.getKey(),
                   validationHeader, validationFilePrintStream
           );
-          System.out.printf("\t%10.10s %2d bf=%6.3f depth=%3d size=%4d %30.30s%n",
-                  validationProblemName, r, best.getSecond().getValue(),
-                  best.getFirst().depth(), best.getFirst().nodeSize(),
-                  validationProblems.get(validationProblemName).getPhenotypePrinter().toString(best.getFirst())
+            System.out.printf("\t%10.10s %2d bf=%6.3f depth=%3d size=%4d %30.30s%n",
+                  stringProblemEntry.getKey(), r, best.second.getValue(),
+                  best.first.depth(), best.first.nodeSize(),
+                  stringProblemEntry.getValue().getPhenotypePrinter().toString(best.first)
           );
           validationHeader = false;
         }
@@ -168,12 +167,12 @@ public class MapperGenerationExperimenter {
     for (int s = 0; s < runs; s++) {
       Random innerRandom = new Random(1l);
       PartitionConfiguration<Node<String>, String, MultiObjectiveFitness<Double>> configuration = new PartitionConfiguration<>(
-              new IndividualComparator<Node<String>, String, MultiObjectiveFitness<Double>>(IndividualComparator.Attribute.PHENO),
+              new IndividualComparator<>(IndividualComparator.Attribute.PHENO),
               10,
-              new ComparableRanker<>(new IndividualComparator<Node<String>, String, MultiObjectiveFitness<Double>>(IndividualComparator.Attribute.AGE)),
-              new FirstBest<Individual<Node<String>, String, MultiObjectiveFitness<Double>>>(),
-              new ComparableRanker<>(new IndividualComparator<Node<String>, String, MultiObjectiveFitness<Double>>(IndividualComparator.Attribute.AGE)),
-              new LastWorst<Individual<Node<String>, String, MultiObjectiveFitness<Double>>>(),
+              new ComparableRanker<>(new IndividualComparator<>(IndividualComparator.Attribute.AGE)),
+              new FirstBest<>(),
+              new ComparableRanker<>(new IndividualComparator<>(IndividualComparator.Attribute.AGE)),
+              new LastWorst<>(),
               popSize,
               50,
               new MultiInitializer<>(new Utils.MapBuilder<PopulationInitializer<Node<String>>, Double>()
@@ -181,15 +180,15 @@ public class MapperGenerationExperimenter {
                       .put(new RandomInitializer<>(new FullTreeFactory<>(maxDepth, problem.getGrammar())), 0.5)
                       .build()
               ),
-              new Any<Node<String>>(),
-              new CfgGpMapper<String>(),
+              new Any<>(),
+              new CfgGpMapper<>(),
               new Utils.MapBuilder<GeneticOperator<Node<String>>, Double>()
-                      .put(new StandardTreeCrossover<String>(maxDepth), 0.8d)
+                      .put(new StandardTreeCrossover<>(maxDepth), 0.8d)
                       .put(new StandardTreeMutation<>(maxDepth, problem.getGrammar()), 0.2d)
                       .build(),
-              new ParetoRanker<Node<String>, String, MultiObjectiveFitness<Double>>(),
-              new Tournament<Individual<Node<String>, String, MultiObjectiveFitness<Double>>>(3),
-              new LastWorst<Individual<Node<String>, String, MultiObjectiveFitness<Double>>>(),
+              new ParetoRanker<>(),
+              new Tournament<>(3),
+              new LastWorst<>(),
               popSize,
               true,
               problem,
@@ -199,18 +198,18 @@ public class MapperGenerationExperimenter {
       List<EvolverListener<Node<String>, String, MultiObjectiveFitness<Double>>> listeners = new ArrayList<>();
       listeners.add(new CollectorGenerationLogger<>(
               (Map) Collections.singletonMap("run", s), System.out, true, 10, " ", " | ",
-              new Population<Node<String>, String, MultiObjectiveFitness<Double>>(),
-              new MultiObjectiveFitnessFirstBest<Node<String>, String, Double>(false, problem.getTestingFitnessComputer(), rep("%4.2f", properties.length)),
-              new Diversity<Node<String>, String, MultiObjectiveFitness<Double>>(),
-              new BestPrinter<Node<String>, String, MultiObjectiveFitness<Double>>(problem.getPhenotypePrinter(), "%30.30s")
+              new Population<>(),
+              new MultiObjectiveFitnessFirstBest<>(false, problem.getTestingFitnessComputer(), rep("%4.2f", properties.length)),
+              new Diversity<>(),
+              new BestPrinter<>(problem.getPhenotypePrinter(), "%30.30s")
       ));
       if (mainFilePrintStream != null) {
         listeners.add(new CollectorGenerationLogger<>(
                 (Map) Collections.singletonMap("run", s), mainFilePrintStream, false, mainHeader ? 0 : -1, ";", ";",
-                new Population<Node<String>, String, MultiObjectiveFitness<Double>>(),
-                new MultiObjectiveFitnessFirstBest<Node<String>, String, Double>(false, problem.getTestingFitnessComputer(), rep("%4.2f", properties.length)),
-                new Diversity<Node<String>, String, MultiObjectiveFitness<Double>>(),
-                new BestPrinter<Node<String>, String, MultiObjectiveFitness<Double>>(problem.getPhenotypePrinter(), "%30.30s")
+                new Population<>(),
+                new MultiObjectiveFitnessFirstBest<>(false, problem.getTestingFitnessComputer(), rep("%4.2f", properties.length)),
+                new Diversity<>(),
+                new BestPrinter<>(problem.getPhenotypePrinter(), "%30.30s")
         ));
       }
       mainHeader = false;
@@ -218,19 +217,19 @@ public class MapperGenerationExperimenter {
       List<Node<String>> bests = evolver.solve(executor, random, listeners);
       System.out.printf("Found %d solutions.%n", bests.size());
       String mapperName = "best";
-      for (String validationProblemName : validationProblems.keySet()) {
+      for (Map.Entry<String, Problem<String, NumericFitness>> stringProblemEntry: validationProblems.entrySet()) {
         for (int r = 0; r < validationRuns; r++) {
           Pair<Node<String>, NumericFitness> best = applyMapperOnProblem(
                   bests.get(0),
-                  validationProblems.get(validationProblemName),
+                  stringProblemEntry.getValue(),
                   validationPopSize, validationGenotypeSize, validationGenerations, validationMaxMappingDepth, expressivenessDepth,
-                  mapperName, r, validationProblemName,
+                  mapperName, r, stringProblemEntry.getKey(),
                   validationHeader, validationFilePrintStream
           );
-          System.out.printf("\t%10.10s %2d bf=%6.3f depth=%3d size=%4d %30.30s%n",
-                  validationProblemName, r, best.getSecond().getValue(),
-                  best.getFirst().depth(), best.getFirst().nodeSize(),
-                  validationProblems.get(validationProblemName).getPhenotypePrinter().toString(best.getFirst())
+            System.out.printf("\t%10.10s %2d bf=%6.3f depth=%3d size=%4d %30.30s%n",
+                  stringProblemEntry.getKey(), r, best.second.getValue(),
+                  best.first.depth(), best.first.nodeSize(),
+                  stringProblemEntry.getValue().getPhenotypePrinter().toString(best.first)
           );
           validationHeader = false;
         }
@@ -317,7 +316,7 @@ public class MapperGenerationExperimenter {
     );
   }
 
-  public static Node<String> getWHGERawTree() {
+  private static Node<String> getWHGERawTree() {
     return node("<mapper>",
             node("<n>",
                     node("<fun_n_ln>",
@@ -380,7 +379,7 @@ public class MapperGenerationExperimenter {
     );
   }
 
-  public static Node<String> getHGERawTree() {
+  private static Node<String> getHGERawTree() {
     return node("<mapper>",
             node("<n>",
                     node("<fun_n_ln>",
@@ -462,14 +461,14 @@ public class MapperGenerationExperimenter {
             popSize,
             generations,
             new RandomInitializer<>(new BitsGenotypeFactory(genotypeSize)),
-            new Any<BitsGenotype>(),
+            new Any<>(),
             new RecursiveMapper<>(rawMapper, maxMappingDepth, expressivenessDepth, problem.getGrammar()),
             new Utils.MapBuilder<GeneticOperator<BitsGenotype>, Double>()
                     .put(new LengthPreservingTwoPointsCrossover(), 0.8d)
                     .put(new ProbabilisticMutation(0.01), 0.2d).build(),
-            new ComparableRanker<>(new IndividualComparator<BitsGenotype, String, NumericFitness>(IndividualComparator.Attribute.FITNESS)),
-            new Tournament<Individual<BitsGenotype, String, NumericFitness>>(3),
-            new LastWorst<Individual<BitsGenotype, String, NumericFitness>>(),
+            new ComparableRanker<>(new IndividualComparator<>(IndividualComparator.Attribute.FITNESS)),
+            new Tournament<>(3),
+            new LastWorst<>(),
             popSize,
             true,
             problem,
@@ -484,9 +483,9 @@ public class MapperGenerationExperimenter {
                       .put("problem", problemName)
                       .put("run", run).build(),
               ps, false, header ? 0 : -1, ";", ";",
-              new Population<BitsGenotype, String, NumericFitness>(),
-              new NumericFirstBest<BitsGenotype, String>(false, problem.getTestingFitnessComputer(), "%6.2f"),
-              new Diversity<BitsGenotype, String, NumericFitness>())
+              new Population<>(),
+              new NumericFirstBest<>(false, problem.getTestingFitnessComputer(), "%6.2f"),
+              new Diversity<>())
       );
     }
     Evolver<BitsGenotype, String, NumericFitness> evolver = new StandardEvolver<>(configuration, false);

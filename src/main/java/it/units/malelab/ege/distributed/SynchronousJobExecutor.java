@@ -11,7 +11,6 @@ import it.units.malelab.ege.core.listener.AbstractListener;
 import it.units.malelab.ege.core.listener.CollectorGenerationLogger;
 import it.units.malelab.ege.core.listener.EvolverListener;
 import it.units.malelab.ege.core.listener.collector.Collector;
-import it.units.malelab.ege.core.listener.event.EvolutionEndEvent;
 import it.units.malelab.ege.core.listener.event.EvolutionEvent;
 import it.units.malelab.ege.core.listener.event.GenerationEvent;
 import it.units.malelab.ege.distributed.master.Master;
@@ -58,7 +57,7 @@ public class SynchronousJobExecutor implements JobExecutor {
       public void listen(EvolutionEvent event) {
         //compute data
         Map<String, Object> data = new LinkedHashMap<>();
-        int generation = ((GenerationEvent) event).getGeneration();
+        int generation = event.getGeneration();
         data.put(Master.GENERATION_NAME, generation);
         data.put(Master.LOCAL_TIME_NAME, Calendar.getInstance().getTime().getTime());
         for (Collector collector : (List<Collector>) job.getCollectors()) {
@@ -69,7 +68,7 @@ public class SynchronousJobExecutor implements JobExecutor {
       }
     });
     listeners.add(new CollectorGenerationLogger(
-            Collections.EMPTY_MAP, System.out, true, 10, " ", " | ", (Collector[]) job.getCollectors().toArray()
+            Collections.emptyMap(), System.out, true, 10, " ", " | ", (Collector[]) job.getCollectors().toArray()
     ));
     //prepare random
     Integer randomSeed = (Integer) job.getKeys().get(Master.RANDOM_SEED_NAME);
@@ -87,7 +86,7 @@ public class SynchronousJobExecutor implements JobExecutor {
     } catch (RuntimeException ex) {
       L.log(Level.SEVERE, String.format("RuntimeException in job: %s %s", job.getId(), job.getKeys()), ex);
     }
-    return Utils.future((List<Node>)Collections.EMPTY_LIST);
+    return Utils.future(Collections.emptyList());
   }
 
   public ExecutorService getExecutor() {

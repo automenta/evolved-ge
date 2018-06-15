@@ -7,7 +7,7 @@ package it.units.malelab.ege.cfggp.mapper;
 
 import it.units.malelab.ege.core.Node;
 import it.units.malelab.ege.core.mapper.Mapper;
-import it.units.malelab.ege.core.mapper.MappingException;
+
 import java.util.Map;
 
 /**
@@ -17,7 +17,7 @@ import java.util.Map;
 public class CfgGpMapper<T> implements Mapper<Node<T>, T>{
 
   @Override
-  public Node<T> map(Node<T> genotype, Map<String, Object> report) throws MappingException {
+  public Node<T> map(Node<T> genotype, Map<String, Object> report) {
     return genotype;
   }
   

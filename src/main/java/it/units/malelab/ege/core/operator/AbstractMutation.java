@@ -5,8 +5,6 @@
  */
 package it.units.malelab.ege.core.operator;
 
-import java.util.Random;
-
 /**
  *
  * @author eric

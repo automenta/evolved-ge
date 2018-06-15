@@ -32,7 +32,7 @@ public class BitsSGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
   private final List<Integer> nonTerminalSizes;
   private final List<Integer> nonTerminalCodonsNumbers;
   private int overallSize;
-  private int maxDepth;
+  private final int maxDepth;
 
   public BitsSGEMapper(int maxDepth, Grammar<T> grammar) {
     super(grammar);
@@ -40,7 +40,7 @@ public class BitsSGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
     nonRecursiveGrammar = Utils.resolveRecursiveGrammar(grammar, maxDepth);
     Map<Pair<T, Integer>, Range<Integer>> codonsRangesMap = new LinkedHashMap<>();
     int startingIndex = 0;
-    for (Pair<T, Integer> p : nonRecursiveGrammar.getRules().keySet()) {
+      for (Pair<T, Integer> p : nonRecursiveGrammar.keySet()) {
       int maximumExpansions = maximumExpansions(p, nonRecursiveGrammar);
       codonsRangesMap.put(p, Range.closedOpen(startingIndex, startingIndex + maximumExpansions));
       startingIndex = startingIndex + maximumExpansions;
@@ -52,20 +52,20 @@ public class BitsSGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
     for (Pair<T, Integer> nonTerminal : nonTerminals) {
       Range<Integer> range = codonsRangesMap.get(nonTerminal);
       int nonTerminalCodonsNumber = range.upperEndpoint() - range.lowerEndpoint();
-      int codonSize = (int) Math.max(Math.ceil(Math.log10(nonRecursiveGrammar.getRules().get(nonTerminal).size()) / Math.log10(2)), 1);
+        int codonSize = (int) Math.max(Math.ceil(Math.log10(nonRecursiveGrammar.get(nonTerminal).size()) / Math.log10(2)), 1);
       nonTerminalSizes.add(nonTerminalCodonsNumber * codonSize);
       nonTerminalCodonsNumbers.add(nonTerminalCodonsNumber);
       overallSize = overallSize + nonTerminalCodonsNumber * codonSize;
     }
   }
 
-  private <E> int maximumExpansions(E nonTerminal, Grammar<E> g) {
+  private static <E> int maximumExpansions(E nonTerminal, Grammar<E> g) {
     //assume non recursive grammar
     if (nonTerminal.equals(g.getStartingSymbol())) {
       return 1;
     }
     int count = 0;
-    for (Map.Entry<E, List<List<E>>> rule : g.getRules().entrySet()) {
+      for (Map.Entry<E, List<List<E>>> rule : g.entrySet()) {
       int maxCount = Integer.MIN_VALUE;
       for (List<E> option : rule.getValue()) {
         int optionCount = 0;
@@ -103,7 +103,7 @@ public class BitsSGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
     while (true) {
       Node<Pair<T, Integer>> nodeToBeReplaced = null;
       for (Node<Pair<T, Integer>> node : tree.leafNodes()) {
-        if (nonRecursiveGrammar.getRules().keySet().contains(node.getContent())) {
+          if (nonRecursiveGrammar.keySet().contains(node.content)) {
           nodeToBeReplaced = node;
           break;
         }
@@ -112,8 +112,8 @@ public class BitsSGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
         break;
       }
       //get codon
-      Range<Integer> range = codonRanges.get(nodeToBeReplaced.getContent()).get(expandedSymbols.count(nodeToBeReplaced.getContent()));
-      List<List<Pair<T, Integer>>> options = nonRecursiveGrammar.getRules().get(nodeToBeReplaced.getContent());
+      Range<Integer> range = codonRanges.get(nodeToBeReplaced.content).get(expandedSymbols.count(nodeToBeReplaced.content));
+        List<List<Pair<T, Integer>>> options = nonRecursiveGrammar.get(nodeToBeReplaced.content);
       int codonSize = (int) Math.max(Math.ceil(Math.log10(options.size()) / Math.log10(2)), 1);
       int codonValue = genotype.slice(range).compress(codonSize).toInt();
       int optionIndex = codonValue % options.size();
@@ -124,9 +124,9 @@ public class BitsSGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
       //add children
       for (Pair<T, Integer> p : options.get(optionIndex)) {
         Node<Pair<T, Integer>> newChild = new Node<>(p);
-        nodeToBeReplaced.getChildren().add(newChild);
+          nodeToBeReplaced.children.add(newChild);
       }
-      expandedSymbols.add(nodeToBeReplaced.getContent());
+      expandedSymbols.add(nodeToBeReplaced.content);
     }
     report.put(BIT_USAGES_INDEX_NAME, bitUsages);
     //transform tree
@@ -134,9 +134,9 @@ public class BitsSGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
   }
 
   private Node<T> transform(Node<Pair<T, Integer>> pairNode) {
-    Node<T> node = new Node<>(pairNode.getContent().getFirst());
-    for (Node<Pair<T, Integer>> pairChild : pairNode.getChildren()) {
-      node.getChildren().add(transform(pairChild));
+    Node<T> node = new Node<>(pairNode.content.first);
+      for (Node<Pair<T, Integer>> pairChild : pairNode.children) {
+          node.children.add(transform(pairChild));
     }
     return node;
   }

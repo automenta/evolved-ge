@@ -9,10 +9,8 @@ import it.units.malelab.ege.core.operator.AbstractMutation;
 import it.units.malelab.ege.util.Pair;
 import it.units.malelab.ege.ge.genotype.SGEGenotype;
 import it.units.malelab.ege.ge.mapper.SGEMapper;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+
+import java.util.*;
 
 /**
  *
@@ -40,7 +38,7 @@ public class SGEMutation<T> extends AbstractMutation<SGEGenotype<T>> {
         }
       }
     }
-    return Arrays.asList(child);
+    return Collections.singletonList(child);
   }
   
 }

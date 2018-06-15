@@ -13,6 +13,6 @@ import java.io.Serializable;
  */
 public interface Distance<T> extends Serializable {
   
-  public double d(T t1, T t2);
+  double d(T t1, T t2);
   
 }

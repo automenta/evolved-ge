@@ -7,21 +7,11 @@ package it.units.malelab.ege.util;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import com.google.common.collect.Range;
-import it.units.malelab.ege.core.Grammar;
-import it.units.malelab.ege.core.Individual;
-import it.units.malelab.ege.core.Node;
-import it.units.malelab.ege.core.Sequence;
-import it.units.malelab.ege.core.listener.EvolverListener;
-import it.units.malelab.ege.core.listener.event.EvolutionEvent;
-import java.io.File;
-import java.io.PrintStream;
+
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -36,9 +26,9 @@ public class UtilsTest {
   
   @Test
   public void testMultisetDiversity() {
-    Random random = new Random(1l);
+    Random random = new Random(1L);
     for (int ss = 2; ss<100; ss++) {
-      Set<Integer> domain = new HashSet<>();
+      Collection<Integer> domain = new HashSet<>();
       for (int i = 0; i<ss; i++) {
         domain.add(i);
       }

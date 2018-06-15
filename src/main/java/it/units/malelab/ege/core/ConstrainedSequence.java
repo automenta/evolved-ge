@@ -13,6 +13,6 @@ import java.util.Set;
  */
 public interface ConstrainedSequence<T> extends Sequence<T> {
   
-  public Set<T> domain(int index);
+  Set<T> domain(int index);
   
 }

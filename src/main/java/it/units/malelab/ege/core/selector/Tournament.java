@@ -29,12 +29,8 @@ public class Tournament<T> implements Selector<T> {
     for (int i = 0; i<size; i++) {
       int rankIndex = random.nextInt(ts.size());
       int index = random.nextInt(ts.get(rankIndex).size());
-      List<T> localTs = selected.get(rankIndex);
-      if (localTs==null) {
-        localTs = new ArrayList<>();
-        selected.put(rankIndex, localTs);
-      }
-      localTs.add(ts.get(rankIndex).get(index));
+        List<T> localTs = selected.computeIfAbsent(rankIndex, k -> new ArrayList<>());
+        localTs.add(ts.get(rankIndex).get(index));
     }
     return selected.get(selected.firstKey()).get(0);
   }

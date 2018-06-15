@@ -10,16 +10,16 @@ import java.io.IOException;
  *
  * @author erikhemberg
  */
-public class Trail {
+class Trail {
 
-    public static final int GRID_WIDTH = 32;
-    public static final int GRID_HEIGHT = 32;
-    public static final int EMPTY = 0;
-    public static final int FOOD = 1;
+    private static final int GRID_WIDTH = 32;
+    private static final int GRID_HEIGHT = 32;
+    private static final int EMPTY = 0;
+    private static final int FOOD = 1;
     public static final int ANT = 8;
-    public int _energy;
-    public int _picked_up;
-    public int[][] _trail = {
+    private int _energy;
+    private int _picked_up;
+    private final int[][] _trail = {
         {0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0},
@@ -52,7 +52,7 @@ public class Trail {
         {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-    public int[][] _working_trail = {
+    private final int[][] _working_trail = {
         {0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0},
@@ -85,8 +85,11 @@ public class Trail {
         {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
-    public int food;
-    public int _current_X, _current_Y, _facing_current_X, _facing_current_Y;
+    private int food;
+    private int _current_X;
+    private int _current_Y;
+    private int _facing_current_X;
+    private int _facing_current_Y;
 
     public Trail() {
         initGEtrail(600);
@@ -100,7 +103,7 @@ public class Trail {
         return this._energy;
     }
 
-    public boolean get_Energy_Left() {
+    private boolean get_Energy_Left() {
         return this._energy > 0;
     }
 
@@ -108,15 +111,15 @@ public class Trail {
         return this.food;
     }
 
-    public int get_Picked_Up() {
+    private int get_Picked_Up() {
         return this._picked_up;
     }
 
     public double getFitness() {
-        return (double) (this.getFood() - this.get_Picked_Up());
+        return (this.getFood() - this.get_Picked_Up());
     }
 
-    void initGEtrail(int e) {
+    private void initGEtrail(int e) {
         _current_X = 0;
         _current_Y = 0;
         _facing_current_X = 0;//1 TODO:make sure this is correct

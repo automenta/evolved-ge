@@ -14,6 +14,6 @@ import java.util.Random;
  */
 public interface Validator<G> extends Serializable {
   
-    public boolean validate(G g, Random random);
+    boolean validate(G g, Random random);
 
 }

@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
  */
 public class RecursiveMapperTest {
 
-  private Node<String> standardGERawTree;
+  private final Node<String> standardGERawTree;
 
   public RecursiveMapperTest() {
     standardGERawTree = MapperGenerationExperimenter.getGERawTree();
@@ -38,12 +38,11 @@ public class RecursiveMapperTest {
       StringBuilder valueSB = new StringBuilder();
       valueSB.append(Integer.toBinaryString(value));
       while (valueSB.length() < 8) {
-        valueSB.insert(0, "0");
+        valueSB.insert(0, '0');
       }
-      sb.append(valueSB.reverse().toString());
+      sb.append(valueSB.reverse());
     }
-    BitsGenotype g = new BitsGenotype(sb.toString());
-    return g;
+      return new BitsGenotype(sb.toString());
   }
 
   @BeforeClass
@@ -70,8 +69,8 @@ public class RecursiveMapperTest {
     //test mapping of hand-crafted geno with standard GE
     BitsGenotype genotype = bg8(0, 2, 1, 3, 2, 0, 2, 1);
     Map<String, Object> report = new HashMap<>();
-    RecursiveMapper instance = new RecursiveMapper<>(standardGERawTree, 10, 3, Utils.parseFromFile(new File("grammars/symbolic-regression-classic4.bnf")));;
-    Node<String> result = instance.map(genotype, report);
+    RecursiveMapper instance = new RecursiveMapper<>(standardGERawTree, 10, 3, Utils.parseFromFile(new File("grammars/symbolic-regression-classic4.bnf")));
+      Node<String> result = instance.map(genotype, report);
     Node<String> expected = node("<expr>",
             node("<op>",
                     node("*")),

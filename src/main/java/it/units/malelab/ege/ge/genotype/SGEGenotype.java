@@ -87,10 +87,7 @@ public class SGEGenotype<T> implements ConstrainedSequence<Integer> {
       return false;
     }
     final SGEGenotype<?> other = (SGEGenotype<?>) obj;
-    if (!Objects.equals(this.genes, other.genes)) {
-      return false;
-    }
-    return true;
+      return Objects.equals(this.genes, other.genes);
   }
 
   @Override
@@ -99,7 +96,7 @@ public class SGEGenotype<T> implements ConstrainedSequence<Integer> {
     if (geneIndex==null) {
       throw new IndexOutOfBoundsException();
     }
-    return genes.get(geneIndex.getFirst()).get(geneIndex.getSecond());
+    return genes.get(geneIndex.first).get(geneIndex.second);
   }
 
   @Override
@@ -119,7 +116,7 @@ public class SGEGenotype<T> implements ConstrainedSequence<Integer> {
       if (geneIndex==null) {
         throw new IndexOutOfBoundsException();
       }
-      genes.get(geneIndex.getFirst()).set(geneIndex.getSecond(), t);
+      genes.get(geneIndex.first).set(geneIndex.second, t);
     } else {
       throw new IllegalArgumentException(String.format("%d is not included in the domain of gene %d.", t, index));
     }

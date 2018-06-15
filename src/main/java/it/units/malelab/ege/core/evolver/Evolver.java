@@ -19,8 +19,8 @@ import java.util.concurrent.ExecutorService;
  */
 public interface Evolver<G, T, F extends Fitness> {
   
-  public Configuration<G, T, F> getConfiguration();
-  public List<Node<T>> solve(
+  Configuration<G, T, F> getConfiguration();
+  List<Node<T>> solve(
           ExecutorService executor,
           Random random,
           List<EvolverListener<G, T, F>> listeners

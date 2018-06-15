@@ -9,56 +9,42 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
  * @author eric
  */
 public class Pair<F, S> implements Serializable {
-  
-  private final F first;
-  private final S second;
 
-  public Pair(F first, S second) {
-    this.first = first;
-    this.second = second;
-  }
+    public final F first;
+    public final S second;
+    public final int hash;
 
-  public F getFirst() {
-    return first;
-  }
-
-  public S getSecond() {
-    return second;
-  }
-
-  @Override
-  public int hashCode() {
-    int hash = 5;
-    hash = 83 * hash + Objects.hashCode(this.first);
-    hash = 83 * hash + Objects.hashCode(this.second);
-    return hash;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
+    public Pair(F first, S second) {
+        this.first = first;
+        this.second = second;
+        int hash = 5;
+        hash = 83 * hash + Objects.hashCode(this.first);
+        hash = 83 * hash + Objects.hashCode(this.second);
+        this.hash = hash;
     }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    final Pair<?, ?> other = (Pair<?, ?>) obj;
-    if (!Objects.equals(this.first, other.first)) {
-      return false;
-    }
-    if (!Objects.equals(this.second, other.second)) {
-      return false;
-    }
-    return true;
-  }
 
-  @Override
-  public String toString() {
-    return "<" + first + ", " + second + '>';
-  }
-  
+    @Override
+    public int hashCode() {
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Pair)) return false;
+
+        final Pair other = (Pair) obj;
+        if (hash!=other.hash) return false;
+
+        return Objects.equals(this.first, other.first) && Objects.equals(this.second, other.second);
+    }
+
+    @Override
+    public String toString() {
+        return "<" + first + ", " + second + '>';
+    }
+
 }

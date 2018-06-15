@@ -27,8 +27,8 @@ public class LocalizedTwoPointsCrossover extends TwoPointsCrossover {
     } while (pivot1 == pivot2);
     int startIndex0 = Math.min(pivot2, pivot1);
     int endIndex0 = Math.max(pivot2, pivot1);
-    int startIndex1 = (int) Math.round((double) startIndex0 * (double) parent1.size() / (double) parent0.size());
-    int endIndex1 = Math.min(Math.max((int) Math.round((double) endIndex0 * (double) parent1.size() / (double) parent0.size()), startIndex1+1), parent1.size());
+    int startIndex1 = (int) Math.round((double) startIndex0 * parent1.size() / parent0.size());
+    int endIndex1 = Math.min(Math.max((int) Math.round((double) endIndex0 * parent1.size() / parent0.size()), startIndex1+1), parent1.size());
     return children(
             parent0, Range.closedOpen(startIndex0, endIndex0),
             parent1, Range.closedOpen(startIndex1, endIndex1));

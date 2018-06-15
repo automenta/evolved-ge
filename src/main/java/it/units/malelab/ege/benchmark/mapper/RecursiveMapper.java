@@ -8,10 +8,9 @@ package it.units.malelab.ege.benchmark.mapper;
 import it.units.malelab.ege.benchmark.mapper.element.Element;
 import it.units.malelab.ege.core.Grammar;
 import it.units.malelab.ege.core.Node;
-import it.units.malelab.ege.core.mapper.MappingException;
 import it.units.malelab.ege.ge.genotype.BitsGenotype;
 import it.units.malelab.ege.ge.mapper.WeightedHierarchicalMapper;
-import it.units.malelab.ege.util.Utils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,14 +28,14 @@ public class RecursiveMapper<T> extends WeightedHierarchicalMapper<T> {
   public RecursiveMapper(Node<String> rawMappingTree, int maxMappingDepth, int maxDepth, Grammar<T> grammar) {
     super(maxDepth, grammar);
     this.maxMappingDepth = maxMappingDepth;
-    optionChooser = MapperUtils.transform(rawMappingTree.getChildren().get(0));
-    genoAssigner = MapperUtils.transform(rawMappingTree.getChildren().get(1));
+    optionChooser = MapperUtils.transform(rawMappingTree.children.get(0));
+    genoAssigner = MapperUtils.transform(rawMappingTree.children.get(1));
     optionChooser.propagateParentship();
     genoAssigner.propagateParentship();
   }
 
   @Override
-  public Node<T> map(BitsGenotype genotype, Map<String, Object> report) throws MappingException {
+  public Node<T> map(BitsGenotype genotype, Map<String, Object> report) {
     GlobalCounter mappingGlobalCounter = new GlobalCounter();
     GlobalCounter finalizationGlobalCounter = new GlobalCounter();
     Node<T> tree = mapRecursively(grammar.getStartingSymbol(), genotype, mappingGlobalCounter, finalizationGlobalCounter, 0);
@@ -52,19 +51,19 @@ public class RecursiveMapper<T> extends WeightedHierarchicalMapper<T> {
           int depth
   ) {
     Node<T> node = new Node<>(symbol);
-    if (!grammar.getRules().containsKey(symbol)) {
+      if (!((Map<T, List<List<T>>>) grammar).containsKey(symbol)) {
       return node;
     }
     if (depth >= maxMappingDepth) {
       List<Integer> shortestOptionIndexTies = shortestOptionIndexesMap.get(symbol);
-      List<T> shortestOption = grammar.getRules().get(symbol).get(shortestOptionIndexTies.get(finalizationGlobalCounter.rw() % shortestOptionIndexTies.size()));
+        List<T> shortestOption = ((Map<T, List<List<T>>>) grammar).get(symbol).get(shortestOptionIndexTies.get(finalizationGlobalCounter.rw() % shortestOptionIndexTies.size()));
       for (T optionSymbol : shortestOption) {
-        node.getChildren().add(mapRecursively(optionSymbol, genotype, mappingGlobalCounter, finalizationGlobalCounter, depth + 1));
+        node.children.add(mapRecursively(optionSymbol, genotype, mappingGlobalCounter, finalizationGlobalCounter, depth + 1));
       }
       return node;
     }
     //choose option
-    List<List<T>> options = grammar.getRules().get(symbol);
+      List<List<T>> options = ((Map<T, List<List<T>>>) grammar).get(symbol);
     List<Double> expressivenesses = new ArrayList<>(options.size());
     for (List<T> option : options) {
       double expressiveness = 1d;
@@ -90,7 +89,7 @@ public class RecursiveMapper<T> extends WeightedHierarchicalMapper<T> {
       } else {
         piece = new BitsGenotype(0);
       }
-      node.getChildren().add(mapRecursively(
+      node.children.add(mapRecursively(
               options.get(optionIndex).get(i), piece, mappingGlobalCounter, finalizationGlobalCounter, depth + 1));
     }
     return node;

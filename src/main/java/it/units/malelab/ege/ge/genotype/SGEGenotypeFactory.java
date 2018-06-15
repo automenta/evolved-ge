@@ -42,7 +42,7 @@ public class SGEGenotypeFactory<T> implements Factory<SGEGenotype<T>> {
     double sum = 0;
     for (Map.Entry<Pair<T, Integer>, List<Integer>> entry : mapper.getGeneBounds().entrySet()) {
       for (int bound : entry.getValue()) {
-        sum = sum + Math.log10((double)bound)/Math.log10(2d);
+        sum = sum + Math.log10(bound)/Math.log10(2d);
       }
     }
     return (int) Math.round(sum);

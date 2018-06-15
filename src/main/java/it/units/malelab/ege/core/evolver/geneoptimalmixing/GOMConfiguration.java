@@ -28,7 +28,7 @@ public class GOMConfiguration<G extends ConstrainedSequence, T, F extends Fitnes
   private final AbstractMutation<G> mutationOperator;
 
   public GOMConfiguration(FOSBuilder fosBuilder, AbstractMutation<G> mutationOperator, int populationSize, int numberOfGenerations, PopulationInitializer<G> populationInitializer, Validator<G> initGenotypeValidator, Mapper<G, T> mapper, Ranker<Individual<G, T, F>> ranker, Problem<T, F> problem, boolean actualEvaluations, double maxRelativeElapsed, double maxElapsed) {
-    super(populationSize, numberOfGenerations, populationInitializer, initGenotypeValidator, mapper, Collections.EMPTY_MAP, ranker, null, null, populationSize, false, problem, actualEvaluations, maxRelativeElapsed, maxElapsed);
+    super(populationSize, numberOfGenerations, populationInitializer, initGenotypeValidator, mapper, Collections.emptyMap(), ranker, null, null, populationSize, false, problem, actualEvaluations, maxRelativeElapsed, maxElapsed);
     this.fosBuilder = fosBuilder;
     this.mutationOperator = mutationOperator;
   }

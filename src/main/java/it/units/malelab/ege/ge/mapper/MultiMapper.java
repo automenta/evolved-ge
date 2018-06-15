@@ -21,14 +21,14 @@ import java.util.Map;
  */
 public class MultiMapper<T> implements Mapper<BitsGenotype, T> {
   
-  public static enum SelectionCriterion {RESERVED_BITS, ALL_MODULE, ALL_BINARY, ALL_MAX};
+  public enum SelectionCriterion {RESERVED_BITS, ALL_MODULE, ALL_BINARY, ALL_MAX}
 
-  public static final String MAPPER_INDEX_NAME = "mapper.index";
+    public static final String MAPPER_INDEX_NAME = "mapper.index";
   
   private final SelectionCriterion selectionCriterion;
   private final List<Mapper<BitsGenotype, T>> mappers;
 
-  public MultiMapper(SelectionCriterion selectionCriterion, List<Mapper<BitsGenotype, T>> mappers) {
+  private MultiMapper(SelectionCriterion selectionCriterion, List<Mapper<BitsGenotype, T>> mappers) {
     this.selectionCriterion = selectionCriterion;
     this.mappers = mappers;
   }
@@ -58,7 +58,7 @@ public class MultiMapper<T> implements Mapper<BitsGenotype, T> {
           int index = 0;
           List<BitsGenotype> slices = genotype.slices(Utils.slices(Range.closedOpen(0, genotype.size()), mapperBits));
           for (int i = 0; i<mapperBits; i++) {
-            int value = (int)Math.round((double)slices.get(i).count()/(double)slices.get(i).size());
+            int value = (int)Math.round((double)slices.get(i).count()/ slices.get(i).size());
             index = index+value*(int)Math.pow(2, i);
           }   mapperIndex = index%mappers.size();
           break;
@@ -69,7 +69,7 @@ public class MultiMapper<T> implements Mapper<BitsGenotype, T> {
           double maxValue = Double.NEGATIVE_INFINITY;
           List<BitsGenotype> slices = genotype.slices(Utils.slices(Range.closedOpen(0, genotype.size()), mappers.size()));
           for (int i = 0; i<slices.size(); i++) {
-            double value = (double)slices.get(i).count()/(double)slices.get(i).size();
+            double value = (double)slices.get(i).count()/ slices.get(i).size();
             if (value>maxValue) {
               maxValue = value;
               maxIndex = i;

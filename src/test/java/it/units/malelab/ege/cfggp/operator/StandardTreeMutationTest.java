@@ -8,6 +8,7 @@ package it.units.malelab.ege.cfggp.operator;
 import it.units.malelab.ege.cfggp.initializer.GrowTreeFactory;
 import it.units.malelab.ege.core.Grammar;
 import it.units.malelab.ege.core.Node;
+import it.units.malelab.ege.core.operator.GeneticOperator;
 import it.units.malelab.ege.util.Utils;
 import java.io.File;
 import java.io.IOException;
@@ -57,14 +58,14 @@ public class StandardTreeMutationTest {
     Grammar<String> g = Utils.parseFromFile(new File("grammars/max-grammar.bnf"));
     int maxDepth = 10;
     GrowTreeFactory<String> f = new GrowTreeFactory<>(maxDepth, g);
-    StandardTreeMutation<String> op = new StandardTreeMutation<>(maxDepth, g);
+    GeneticOperator<Node<String>> op = new StandardTreeMutation<>(maxDepth, g);
     List<Node<String>> parents = new ArrayList<>();
     for (int i = 0; i < 50; i++) {
       parents.clear();
       parents.add(f.build(random));
       Node<String> parent1 = parents.get(0);
       List<Node<String>> children = op.apply(parents, random);
-      assertTrue("parent1 should remain unchanged", parent1 == parents.get(0));
+      assertSame("parent1 should remain unchanged", parent1, parents.get(0));
       if (children != null) {
         assertEquals("there should be 1 child", 1, children.size());
         assertTrue("child depth should be <=" + maxDepth, children.get(0).depth() <= maxDepth);

@@ -19,7 +19,7 @@ public class EvolutionEvent<G, T, F extends Fitness> {
   private final Evolver<G, T, F> evolver;
   private final Map<String, Object> data;
 
-  public EvolutionEvent(int generation, Evolver<G, T, F> evolver, Map<String, Object> data) {
+  EvolutionEvent(int generation, Evolver<G, T, F> evolver, Map<String, Object> data) {
     this.generation = generation;
     this.evolver = evolver;
     this.data = data;

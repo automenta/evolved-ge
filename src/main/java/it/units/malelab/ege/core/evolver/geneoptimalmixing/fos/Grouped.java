@@ -31,7 +31,7 @@ public class Grouped implements FOSBuilder {
       minMaxIndex = Math.min(minMaxIndex, sequence.size());
     }
     Set<Set<Integer>> fos = new LinkedHashSet<>();
-    for (int i = 0; i<Math.floor((double)minMaxIndex/(double)groupSize); i++) {
+    for (int i = 0; i<Math.floor((double)minMaxIndex/ groupSize); i++) {
       Set<Integer> subset = new LinkedHashSet<>();
       for (int j = 0; j<groupSize; j++) {
         subset.add(i*groupSize+j);

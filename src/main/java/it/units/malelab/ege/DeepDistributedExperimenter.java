@@ -114,15 +114,10 @@ public class DeepDistributedExperimenter {
             "sge-6",
             "cfggp-12");
     //prepare distances
-    final Distance<Node<String>> phenotypeDistance = new CachedDistance<>(new LeavesEdit<String>());
-    Distance<Sequence<Boolean>> bitsGenotypeDistance = new CachedDistance<>(new Hamming<Boolean>());
-    Distance<Sequence<Integer>> sgeGenotypeDistance = new CachedDistance<>(new Hamming<Integer>());
-    final Distance fitnessDistance = new Distance<NumericFitness>() {
-      @Override
-      public double d(NumericFitness f1, NumericFitness f2) {
-        return Math.abs(f1.getValue() - f2.getValue());
-      }
-    };
+    final Distance<Node<String>> phenotypeDistance = new CachedDistance<>(new LeavesEdit<>());
+    Distance<Sequence<Boolean>> bitsGenotypeDistance = new CachedDistance<>(new Hamming<>());
+    Distance<Sequence<Integer>> sgeGenotypeDistance = new CachedDistance<>(new Hamming<>());
+    final Distance fitnessDistance = (Distance<NumericFitness>) (f1, f2) -> Math.abs(f1.getValue() - f2.getValue());
     //iterate
     for (int run : runs) {
       for (String pr : problems) {
@@ -135,20 +130,28 @@ public class DeepDistributedExperimenter {
             keys.put(Master.RANDOM_SEED_NAME, run);
             //build problem
             Problem<String, NumericFitness> problem = null;
-            if (p(pr, 1).equals("parity")) {
-              problem = new Parity(i(p(pr, 2)));
-            } else if (p(pr, 1).equals("mopm")) {
-              problem = new MultipleOutputParallelMultiplier(i(p(pr, 2)));
-            } else if (p(pr, 1).equals("keijzer6")) {
-              problem = new HarmonicCurve();
-            } else if (p(pr, 1).equals("nguyen7")) {
-              problem = new Nguyen7(0);
-            } else if (p(pr, 1).equals("pagie1")) {
-              problem = new Pagie1();
-            } else if (p(pr, 1).equals("klandscapes")) {
-              problem = new KLandscapes(i(p(pr, 2)));
-            } else if (p(pr, 1).equals("text")) {
-              problem = new Text();
+            switch (p(pr, 1)) {
+              case "parity":
+                problem = new Parity(i(p(pr, 2)));
+                break;
+              case "mopm":
+                problem = new MultipleOutputParallelMultiplier(i(p(pr, 2)));
+                break;
+              case "keijzer6":
+                problem = new HarmonicCurve();
+                break;
+              case "nguyen7":
+                problem = new Nguyen7(0);
+                break;
+              case "pagie1":
+                problem = new Pagie1();
+                break;
+              case "klandscapes":
+                problem = new KLandscapes(i(p(pr, 2)));
+                break;
+              case "text":
+                problem = new Text();
+                break;
             }
             StandardConfiguration configuration = null;
             //build mapper, operators, initializer, genotype distance
@@ -158,138 +161,149 @@ public class DeepDistributedExperimenter {
                     .put(new ProbabilisticMutation(0.01), 0.2d).build();
             PopulationInitializer populationInitializer = null;
             Distance genotypeDistance = bitsGenotypeDistance;
-            if (p(ma, 0).equals("ge")) {
-              mapper = new StandardGEMapper(i(p(ma, 1)), i(p(ma, 2)), problem.getGrammar());
-              populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 3))));
-            } else if (p(ma, 0).equals("pige")) {
-              mapper = new PiGEMapper(i(p(ma, 1)), i(p(ma, 2)), problem.getGrammar());
-              populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 3))));
-            } else if (p(ma, 0).equals("hge")) {
-              mapper = new HierarchicalMapper(problem.getGrammar());
-              populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 1))));
-            } else if (p(ma, 0).equals("whge")) {
-              mapper = new WeightedHierarchicalMapper(i(p(ma, 1)), problem.getGrammar());
-              populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 2))));
-            } else if (p(ma, 0).equals("bitsge")) {
-              mapper = new BitsSGEMapper(i(p(ma, 1)), problem.getGrammar());
-              populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 2))));
-            } else if (p(ma, 0).equals("sge")) {
-              mapper = new SGEMapper(i(p(ma, 1)), problem.getGrammar());
-              operators = new Utils.MapBuilder<>()
-                      .put(new SGECrossover<>(), 0.8d)
-                      .put(new SGEMutation<>(0.01, (SGEMapper<String>) mapper), 0.2d).build();
-              populationInitializer = new RandomInitializer<>(new SGEGenotypeFactory<>((SGEMapper<String>) mapper));
-              genotypeDistance = sgeGenotypeDistance;
-            } else if (p(ma, 0).equals("cfggp")) {
-              mapper = new CfgGpMapper();
-              operators = new Utils.MapBuilder<>()
-                      .put(new StandardTreeCrossover<>(i(p(ma, 1))), 0.8d)
-                      .put(new StandardTreeMutation<>(i(p(ma, 1)), problem.getGrammar()), 0.2d).build();
-              populationInitializer = new MultiInitializer<>(new Utils.MapBuilder<PopulationInitializer<Node<String>>, Double>()
-                      .put(new RandomInitializer<>(new GrowTreeFactory<>(i(p(ma, 1)), problem.getGrammar())), 0.5)
-                      .put(new RandomInitializer<>(new FullTreeFactory<>(i(p(ma, 1)), problem.getGrammar())), 0.5)
-                      .build());
-              genotypeDistance = phenotypeDistance;
+            switch (p(ma, 0)) {
+              case "ge":
+                mapper = new StandardGEMapper(i(p(ma, 1)), i(p(ma, 2)), problem.getGrammar());
+                populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 3))));
+                break;
+              case "pige":
+                mapper = new PiGEMapper(i(p(ma, 1)), i(p(ma, 2)), problem.getGrammar());
+                populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 3))));
+                break;
+              case "hge":
+                mapper = new HierarchicalMapper(problem.getGrammar());
+                populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 1))));
+                break;
+              case "whge":
+                mapper = new WeightedHierarchicalMapper(i(p(ma, 1)), problem.getGrammar());
+                populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 2))));
+                break;
+              case "bitsge":
+                mapper = new BitsSGEMapper(i(p(ma, 1)), problem.getGrammar());
+                populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 2))));
+                break;
+              case "sge":
+                mapper = new SGEMapper(i(p(ma, 1)), problem.getGrammar());
+                operators = new Utils.MapBuilder<>()
+                        .put(new SGECrossover<>(), 0.8d)
+                        .put(new SGEMutation<>(0.01, (SGEMapper<String>) mapper), 0.2d).build();
+                populationInitializer = new RandomInitializer<>(new SGEGenotypeFactory<>((SGEMapper<String>) mapper));
+                genotypeDistance = sgeGenotypeDistance;
+                break;
+              case "cfggp":
+                mapper = new CfgGpMapper();
+                operators = new Utils.MapBuilder<>()
+                        .put(new StandardTreeCrossover<>(i(p(ma, 1))), 0.8d)
+                        .put(new StandardTreeMutation<>(i(p(ma, 1)), problem.getGrammar()), 0.2d).build();
+                populationInitializer = new MultiInitializer<>(new Utils.MapBuilder<PopulationInitializer<Node<String>>, Double>()
+                        .put(new RandomInitializer<>(new GrowTreeFactory<>(i(p(ma, 1)), problem.getGrammar())), 0.5)
+                        .put(new RandomInitializer<>(new FullTreeFactory<>(i(p(ma, 1)), problem.getGrammar())), 0.5)
+                        .build());
+                genotypeDistance = phenotypeDistance;
+                break;
             }
             //build configuration            
-            if (p(me, 0).equals("standard")) {
-              configuration = new StandardConfiguration(
-                      populationSize, generations,
-                      populationInitializer,
-                      new Any(),
-                      mapper,
-                      operators,
-                      new ComparableRanker(new IndividualComparator(IndividualComparator.Attribute.FITNESS)),
-                      new Tournament(tournamentSize),
-                      new LastWorst(),
-                      1,
-                      true,
-                      problem,
-                      false,
-                      -1, -1
-              );
-            } else if (p(me, 0).equals("dc")) {
-              final Distance localGenotypeDistance = genotypeDistance;
-              Distance distance = null;
-              if (p(me, 1).equals("g")) {
-                distance = new Distance<Individual>() {
-                  @Override
-                  public double d(Individual i1, Individual i2) {
-                    return localGenotypeDistance.d(i1.getGenotype(), i2.getGenotype());
-                  }
-                };
-              } else if (p(me, 1).equals("p")) {
-                distance = new Distance<Individual>() {
-                  @Override
-                  public double d(Individual i1, Individual i2) {
-                    return phenotypeDistance.d(i1.getPhenotype(), i2.getPhenotype());
-                  }
-                };
-              } else if (p(me, 1).equals("f")) {
-                distance = new Distance<Individual>() {
-                  @Override
-                  public double d(Individual i1, Individual i2) {
-                    return fitnessDistance.d(i1.getFitness(), i2.getFitness());
-                  }
-                };
-              }
-              configuration = new DeterministicCrowdingConfiguration(
-                      distance,
-                      populationSize,
-                      generations,
-                      populationInitializer,
-                      new Any(),
-                      mapper,
-                      operators,
-                      new ComparableRanker(new IndividualComparator(IndividualComparator.Attribute.FITNESS)),
-                      new Tournament(tournamentSize),
-                      problem,
-                      false,
-                      -1, -1
-              );
-            } else if (p(me, 0).equals("p")) {
-              Ranker<Individual> parentInPartitionRanker = null;
-              Comparator<Individual> partitionerComparator = null;
-              if (p(me, 1).equals("g")) {
-                partitionerComparator = new IndividualComparator(IndividualComparator.Attribute.GENO);
-              } else if (p(me, 1).equals("p")) {
-                partitionerComparator = new IndividualComparator(IndividualComparator.Attribute.PHENO);
-              } else if (p(me, 1).equals("f")) {
-                partitionerComparator = new IndividualComparator(IndividualComparator.Attribute.FITNESS);
-              }
-              if (p(me, 2).equals("u")) {
-                parentInPartitionRanker = new RandomizerRanker();
-              } else if (p(me, 2).equals("a<")) {
-                parentInPartitionRanker = new ComparableRanker(new IndividualComparator(IndividualComparator.Attribute.AGE));
-              } else if (p(me, 2).equals("a>")) {
-                parentInPartitionRanker = new ComparableRanker(Collections.reverseOrder(new IndividualComparator(IndividualComparator.Attribute.AGE)));
-              } else if (p(me, 2).equals("l<")) {
-                parentInPartitionRanker = new ComparableRanker(new IndividualComparator(IndividualComparator.Attribute.PHENO_SIZE));
-              } else if (p(me, 2).equals("l>")) {
-                parentInPartitionRanker = new ComparableRanker(Collections.reverseOrder(new IndividualComparator(IndividualComparator.Attribute.PHENO_SIZE)));
-              }
-              configuration = new PartitionConfiguration(
-                      partitionerComparator,
-                      i(p(me, 3)),
-                      parentInPartitionRanker,
-                      new FirstBest(),
-                      parentInPartitionRanker,
-                      new LastWorst(),
-                      populationSize,
-                      generations,
-                      populationInitializer,
-                      new Any(),
-                      mapper,
-                      operators,
-                      new ComparableRanker(new IndividualComparator(IndividualComparator.Attribute.FITNESS)),
-                      new Tournament(tournamentSize),
-                      new LastWorst(),
-                      1,
-                      true,
-                      problem,
-                      false,
-                      -1, -1
-              );
+            switch (p(me, 0)) {
+              case "standard":
+                configuration = new StandardConfiguration(
+                        populationSize, generations,
+                        populationInitializer,
+                        new Any(),
+                        mapper,
+                        operators,
+                        new ComparableRanker(new IndividualComparator(IndividualComparator.Attribute.FITNESS)),
+                        new Tournament(tournamentSize),
+                        new LastWorst(),
+                        1,
+                        true,
+                        problem,
+                        false,
+                        -1, -1
+                );
+                break;
+              case "dc":
+                final Distance localGenotypeDistance = genotypeDistance;
+                Distance distance = null;
+                switch (p(me, 1)) {
+                  case "g":
+                    distance = (Distance<Individual>) (i1, i2) -> localGenotypeDistance.d(i1.genotype, i2.genotype);
+                    break;
+                  case "p":
+                    distance = (Distance<Individual>) (i1, i2) -> phenotypeDistance.d(i1.phenotype, i2.phenotype);
+                    break;
+                  case "f":
+                    distance = (Distance<Individual>) (i1, i2) -> fitnessDistance.d(i1.fitness, i2.fitness);
+                    break;
+                }
+                configuration = new DeterministicCrowdingConfiguration(
+                        distance,
+                        populationSize,
+                        generations,
+                        populationInitializer,
+                        new Any(),
+                        mapper,
+                        operators,
+                        new ComparableRanker(new IndividualComparator(IndividualComparator.Attribute.FITNESS)),
+                        new Tournament(tournamentSize),
+                        problem,
+                        false,
+                        -1, -1
+                );
+                break;
+              case "p":
+                Ranker<Individual> parentInPartitionRanker = null;
+                Comparator<Individual> partitionerComparator = null;
+                switch (p(me, 1)) {
+                  case "g":
+                    partitionerComparator = new IndividualComparator(IndividualComparator.Attribute.GENO);
+                    break;
+                  case "p":
+                    partitionerComparator = new IndividualComparator(IndividualComparator.Attribute.PHENO);
+                    break;
+                  case "f":
+                    partitionerComparator = new IndividualComparator(IndividualComparator.Attribute.FITNESS);
+                    break;
+                }
+                switch (p(me, 2)) {
+                  case "u":
+                    parentInPartitionRanker = new RandomizerRanker();
+                    break;
+                  case "a<":
+                    parentInPartitionRanker = new ComparableRanker(new IndividualComparator(IndividualComparator.Attribute.AGE));
+                    break;
+                  case "a>":
+                    parentInPartitionRanker = new ComparableRanker(Collections.reverseOrder(new IndividualComparator(IndividualComparator.Attribute.AGE)));
+                    break;
+                  case "l<":
+                    parentInPartitionRanker = new ComparableRanker(new IndividualComparator(IndividualComparator.Attribute.PHENO_SIZE));
+                    break;
+                  case "l>":
+                    parentInPartitionRanker = new ComparableRanker(Collections.reverseOrder(new IndividualComparator(IndividualComparator.Attribute.PHENO_SIZE)));
+                    break;
+                }
+                configuration = new PartitionConfiguration(
+                        partitionerComparator,
+                        i(p(me, 3)),
+                        parentInPartitionRanker,
+                        new FirstBest(),
+                        parentInPartitionRanker,
+                        new LastWorst(),
+                        populationSize,
+                        generations,
+                        populationInitializer,
+                        new Any(),
+                        mapper,
+                        operators,
+                        new ComparableRanker(new IndividualComparator(IndividualComparator.Attribute.FITNESS)),
+                        new Tournament(tournamentSize),
+                        new LastWorst(),
+                        1,
+                        true,
+                        problem,
+                        false,
+                        -1, -1
+                );
+                break;
             }
             Job job = new Job(
                     configuration,

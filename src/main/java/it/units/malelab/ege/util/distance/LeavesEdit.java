@@ -14,12 +14,12 @@ import it.units.malelab.ege.core.Sequence;
  */
 public class LeavesEdit<T> implements Distance<Node<T>> {
   
-  private Distance<Sequence<T>> distance = new Edit<>();
+  private final Distance<Sequence<T>> distance = new Edit<>();
 
   @Override
   public double d(Node<T> t1, Node<T> t2) {
     if (Node.EMPTY_TREE.equals(t1) || Node.EMPTY_TREE.equals(t2)) {
-      return Math.max(t1.leafContents().size(), t2.leafContents().size());
+      return Math.max(t1.size(), t2.size());
     }
     return distance.d(t1.leafContents(), t2.leafContents());
   }

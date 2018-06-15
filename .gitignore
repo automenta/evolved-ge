@@ -1,2 +1,4 @@
 /target/
-/nbproject/
+/nbproject/.iml
+*.iml
+.idea

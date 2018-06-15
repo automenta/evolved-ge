@@ -24,7 +24,7 @@ public enum Function implements Element {
 
   private final String grammarName;
 
-  private Function(String grammarName) {
+  Function(String grammarName) {
     this.grammarName = grammarName;
   }
 

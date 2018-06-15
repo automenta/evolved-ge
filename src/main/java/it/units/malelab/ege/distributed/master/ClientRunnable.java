@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  *
  * @author eric
  */
-public class ClientRunnable implements Runnable {
+class ClientRunnable implements Runnable {
 
   private final Socket socket;
   private final Master master;

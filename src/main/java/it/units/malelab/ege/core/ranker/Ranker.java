@@ -15,6 +15,6 @@ import java.util.Random;
  */
 public interface Ranker<T> extends Serializable {
   
-  public List<List<T>> rank(List<T> ts, Random random);
+  List<List<T>> rank(List<T> ts, Random random);
   
 }

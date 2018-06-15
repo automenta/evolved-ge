@@ -8,7 +8,6 @@ package it.units.malelab.ege.util;
 import it.units.malelab.ege.core.Grammar;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -28,13 +27,13 @@ public class GrammarUtilsTest {
     for (String grammar : grammars) {
       Grammar<String> g = Utils.parseFromFile(new File(grammar));
       Map<String, Pair<Double, Double>> depths = GrammarUtils.computeSymbolsMinMaxDepths(g);
-      assertTrue("Should contain all non-terminal symbols.", depths.keySet().containsAll(g.getRules().keySet()));
-      for (String s : depths.keySet()) {
-        if (!g.getRules().containsKey(s)) {
-          assertTrue("Terminal should have min=1", depths.get(s).getFirst()==1);
-          assertTrue("Terminal should have max=1", depths.get(s).getSecond()==1);
+      assertTrue("Should contain all non-terminal symbols.", depths.keySet().containsAll(g.keySet()));
+      for (Map.Entry<String, Pair<Double, Double>> stringPairEntry: depths.entrySet()) {
+        if (!g.containsKey(stringPairEntry.getKey())) {
+          assertEquals("Terminal should have min=1", 1, stringPairEntry.getValue().first, 0.01f);
+          assertEquals("Terminal should have max=1", 1, stringPairEntry.getValue().second, 0.01f);
         } else {
-          assertTrue("Should have min<=max", depths.get(s).getFirst()<=depths.get(s).getSecond());
+          assertTrue("Should have min<=max", stringPairEntry.getValue().first <= stringPairEntry.getValue().second);
         }
       }
     }

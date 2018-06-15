@@ -6,7 +6,6 @@
 package it.units.malelab.ege.core.evolver.sepandconq;
 
 import it.units.malelab.ege.core.Node;
-import java.util.List;
 
 /**
  *
@@ -14,6 +13,6 @@ import java.util.List;
  */
 public interface Joiner<T> {
   
-  public Node<T> join(Node<T>... pieces);
+  Node<T> join(Node<T>... pieces);
   
 }

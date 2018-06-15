@@ -6,7 +6,6 @@
 package it.units.malelab.ege.ge.mapper;
 
 import it.units.malelab.ege.core.mapper.AbstractMapper;
-import it.units.malelab.ege.core.mapper.MappingException;
 import com.google.common.collect.Range;
 import it.units.malelab.ege.ge.genotype.BitsGenotype;
 import it.units.malelab.ege.core.Node;
@@ -34,11 +33,11 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
     this(grammar, RECURSIVE_DEFAULT);
   }
 
-  public HierarchicalMapper(Grammar<T> grammar, boolean recursive) {
+  private HierarchicalMapper(Grammar<T> grammar, boolean recursive) {
     super(grammar);
     this.recursive = recursive;
     Map<T, List<Integer>> optionJumpsToTerminalMap = new LinkedHashMap<>();
-    for (Map.Entry<T, List<List<T>>> rule : grammar.getRules().entrySet()) {
+      for (Map.Entry<T, List<List<T>>> rule : ((Map<T, List<List<T>>>) grammar).entrySet()) {
       List<Integer> optionsJumps = new ArrayList<>();
       for (List<T> option : rule.getValue()) {
         optionsJumps.add(Integer.MAX_VALUE);
@@ -49,8 +48,8 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
       boolean completed = true;
       for (Map.Entry<T, List<Integer>> entry : optionJumpsToTerminalMap.entrySet()) {
         for (int i = 0; i < entry.getValue().size(); i++) {
-          List<T> option = grammar.getRules().get(entry.getKey()).get(i);
-          if (Collections.disjoint(option, grammar.getRules().keySet())) {
+            List<T> option = ((Map<T, List<List<T>>>) grammar).get(entry.getKey()).get(i);
+            if (Collections.disjoint(option, ((Map<T, List<List<T>>>) grammar).keySet())) {
             entry.getValue().set(i, 1);
           } else {
             int maxJumps = Integer.MIN_VALUE;
@@ -80,7 +79,7 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
     }
     //build shortestOptionIndexMap
     shortestOptionIndexesMap = new LinkedHashMap<>();
-    for (Map.Entry<T, List<List<T>>> rule : grammar.getRules().entrySet()) {
+      for (Map.Entry<T, List<List<T>>> rule : ((Map<T, List<List<T>>>) grammar).entrySet()) {
       int minJumps = Integer.MAX_VALUE;
       for (int i = 0; i < optionJumpsToTerminalMap.get(rule.getKey()).size(); i++) {
         int localJumps = optionJumpsToTerminalMap.get(rule.getKey()).get(i);
@@ -98,28 +97,28 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
     }
   }
 
-  private class EnhancedSymbol<T> {
+  private static class EnhancedSymbol<T> {
 
     private final T symbol;
     private final Range<Integer> range;
 
-    public EnhancedSymbol(T symbol, Range<Integer> range) {
+    EnhancedSymbol(T symbol, Range<Integer> range) {
       this.symbol = symbol;
       this.range = range;
     }
 
-    public T getSymbol() {
+    T getSymbol() {
       return symbol;
     }
 
-    public Range<Integer> getRange() {
+    Range<Integer> getRange() {
       return range;
     }
 
   }
 
   @Override
-  public Node<T> map(BitsGenotype genotype, Map<String, Object> report) throws MappingException {
+  public Node<T> map(BitsGenotype genotype, Map<String, Object> report) {
     int[] bitUsages = new int[genotype.size()];
     Node<T> tree;
     if (recursive) {
@@ -132,7 +131,7 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
     return tree;
   }
 
-  protected List<Range<Integer>> getChildrenSlices(Range<Integer> range, List<T> symbols) {
+  List<Range<Integer>> getChildrenSlices(Range<Integer> range, List<T> symbols) {
     List<Range<Integer>> ranges;
     if (symbols.size() > (range.upperEndpoint() - range.lowerEndpoint())) {
       ranges = new ArrayList<>(symbols.size());
@@ -145,20 +144,20 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
     return ranges;
   }
 
-  protected List<Range<Integer>> getOptionSlices(Range<Integer> range, List<List<T>> options) {
+  List<Range<Integer>> getOptionSlices(Range<Integer> range, List<List<T>> options) {
     return Utils.slices(range, options.size());
   }
 
   private Node<T> extractFromEnhanced(Node<EnhancedSymbol<T>> enhancedNode) {
-    Node<T> node = new Node<>(enhancedNode.getContent().getSymbol());
-    for (Node<EnhancedSymbol<T>> enhancedChild : enhancedNode.getChildren()) {
-      node.getChildren().add(extractFromEnhanced(enhancedChild));
+      Node<T> node = new Node<>(enhancedNode.content.getSymbol());
+      for (Node<EnhancedSymbol<T>> enhancedChild : enhancedNode.children) {
+          node.children.add(extractFromEnhanced(enhancedChild));
     }
     return node;
   }
   
-  protected double optionSliceWeigth(BitsGenotype slice) {
-    return (double) slice.count() / (double) slice.size();
+  double optionSliceWeigth(BitsGenotype slice) {
+    return (double) slice.count() / slice.size();
   }
 
   private List<T> chooseOption(BitsGenotype genotype, Range<Integer> range, List<List<T>> options) {
@@ -185,12 +184,12 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
     return options.get(bestOptionIndexes.get(genotype.slice(range).count() % bestOptionIndexes.size()));
   }
 
-  public Node<T> mapIteratively(BitsGenotype genotype, int[] bitUsages) throws MappingException {
+  private Node<T> mapIteratively(BitsGenotype genotype, int[] bitUsages) {
     Node<EnhancedSymbol<T>> enhancedTree = new Node<>(new EnhancedSymbol<>(grammar.getStartingSymbol(), Range.closedOpen(0, genotype.size())));
     while (true) {
       Node<EnhancedSymbol<T>> nodeToBeReplaced = null;
       for (Node<EnhancedSymbol<T>> node : enhancedTree.leafNodes()) {
-        if (grammar.getRules().keySet().contains(node.getContent().getSymbol())) {
+          if (((Map<T, List<List<T>>>) grammar).keySet().contains(node.content.getSymbol())) {
           nodeToBeReplaced = node;
           break;
         }
@@ -199,9 +198,9 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
         break;
       }
       //get genotype
-      T symbol = nodeToBeReplaced.getContent().getSymbol();
-      Range<Integer> symbolRange = nodeToBeReplaced.getContent().getRange();
-      List<List<T>> options = grammar.getRules().get(symbol);
+        T symbol = nodeToBeReplaced.content.getSymbol();
+        Range<Integer> symbolRange = nodeToBeReplaced.content.getRange();
+        List<List<T>> options = ((Map<T, List<List<T>>>) grammar).get(symbol);
       //get option
       List<T> symbols;
       if ((symbolRange.upperEndpoint() - symbolRange.lowerEndpoint()) < options.size()) {
@@ -225,22 +224,22 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
                 symbols.get(i),
                 childRange
         ));
-        nodeToBeReplaced.getChildren().add(newChild);
+          nodeToBeReplaced.children.add(newChild);
       }
     }
     //convert
     return extractFromEnhanced(enhancedTree);
   }
 
-  public Node<T> mapRecursively(T symbol, Range<Integer> range, BitsGenotype genotype, int[] bitUsages) throws MappingException {
+  private Node<T> mapRecursively(T symbol, Range<Integer> range, BitsGenotype genotype, int[] bitUsages) {
     Node<T> node = new Node<>(symbol);
-    if (grammar.getRules().keySet().contains(symbol)) {
+      if (((Map<T, List<List<T>>>) grammar).keySet().contains(symbol)) {
       //a non-terminal node
       //update usage
       for (int i = range.lowerEndpoint(); i < range.upperEndpoint(); i++) {
         bitUsages[i] = bitUsages[i] + 1;
       }
-      List<List<T>> options = grammar.getRules().get(symbol);
+          List<List<T>> options = ((Map<T, List<List<T>>>) grammar).get(symbol);
       //get option
       List<T> symbols;
       if ((range.upperEndpoint() - range.lowerEndpoint()) < options.size()) {
@@ -263,7 +262,7 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
         }
       }
       for (int i = 0; i < symbols.size(); i++) {
-        node.getChildren().add(mapRecursively(symbols.get(i), childRanges.get(i), genotype, bitUsages));
+          node.children.add(mapRecursively(symbols.get(i), childRanges.get(i), genotype, bitUsages));
       }
     }
     return node;

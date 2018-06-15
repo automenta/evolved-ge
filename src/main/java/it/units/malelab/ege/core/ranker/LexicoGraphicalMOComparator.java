@@ -5,7 +5,6 @@
  */
 package it.units.malelab.ege.core.ranker;
 
-import it.units.malelab.ege.core.Individual;
 import it.units.malelab.ege.core.fitness.MultiObjectiveFitness;
 import java.util.Comparator;
 
@@ -13,7 +12,7 @@ import java.util.Comparator;
  *
  * @author eric
  */
-public class LexicoGraphicalMOComparator implements Comparator<MultiObjectiveFitness> {
+class LexicoGraphicalMOComparator implements Comparator<MultiObjectiveFitness> {
   
   private final int[] order;
 
@@ -24,6 +23,8 @@ public class LexicoGraphicalMOComparator implements Comparator<MultiObjectiveFit
   
   @Override
   public int compare(MultiObjectiveFitness f1, MultiObjectiveFitness f2) {
+      if (f1 == f2)
+          return 0;
     for (int index : order) {
       int result = f1.getValue()[index].compareTo(f2.getValue()[index]);
       if (result!=0) {

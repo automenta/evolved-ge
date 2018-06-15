@@ -7,7 +7,7 @@ package it.units.malelab.ege.ge.operator;
 
 import com.google.common.collect.Range;
 import it.units.malelab.ege.ge.genotype.BitsGenotype;
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.Random;
 

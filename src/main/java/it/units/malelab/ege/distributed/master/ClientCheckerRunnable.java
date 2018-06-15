@@ -14,7 +14,7 @@ import java.util.logging.Logger;
  *
  * @author eric
  */
-public class ClientCheckerRunnable implements Runnable {
+class ClientCheckerRunnable implements Runnable {
 
   private final Master master;
 

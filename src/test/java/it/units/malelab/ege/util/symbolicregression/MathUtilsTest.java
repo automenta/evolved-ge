@@ -38,14 +38,14 @@ public class MathUtilsTest {
     flatMap.put("a", new double[]{0, 1, 2});
     flatMap.put("b", new double[]{1, 2, 3});
     Node<String> f = new Node<>("<expr>");
-    f.getChildren().add(new Node<>("<op>"));
-    f.getChildren().add(new Node<>("<expr>"));
-    f.getChildren().add(new Node<>("<expr>"));
-    f.getChildren().get(0).getChildren().add(new Node<>("+"));
-    f.getChildren().get(1).getChildren().add(new Node<>("<var>"));
-    f.getChildren().get(2).getChildren().add(new Node<>("<var>"));
-    f.getChildren().get(1).getChildren().get(0).getChildren().add(new Node<>("a"));
-    f.getChildren().get(2).getChildren().get(0).getChildren().add(new Node<>("b"));
+    f.children.add(new Node<>("<op>"));
+    f.children.add(new Node<>("<expr>"));
+    f.children.add(new Node<>("<expr>"));
+    f.children.get(0).children.add(new Node<>("+"));
+    f.children.get(1).children.add(new Node<>("<var>"));
+    f.children.get(2).children.add(new Node<>("<var>"));
+    f.children.get(1).children.get(0).children.add(new Node<>("a"));
+      f.children.get(2).children.get(0).children.add(new Node<>("b"));
     double[] result = MathUtils.compute(MathUtils.transform(f), flatMap, 3);
     assertArrayEquals("a+b should give [1,3,5]", new double[]{1, 3, 5}, result, 0);
   }

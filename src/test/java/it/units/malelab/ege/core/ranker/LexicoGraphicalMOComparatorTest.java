@@ -49,8 +49,8 @@ public class LexicoGraphicalMOComparatorTest {
     LexicoGraphicalMOComparator c = new LexicoGraphicalMOComparator(0, 1, 2);
     assertTrue("f1>f2", c.compare(f1, f2) > 0);
     assertTrue("f2<f1", c.compare(f2, f1) < 0);
-    assertTrue("f2<>f3", c.compare(f2, f3) == 0);
-    assertTrue("f3<>f2", c.compare(f3, f2) == 0);
+      assertEquals("f2<>f3", 0, c.compare(f2, f3));
+      assertEquals("f3<>f2", 0, c.compare(f3, f2));
     c = new LexicoGraphicalMOComparator(2, 1, 0);
     assertTrue("f1<f2", c.compare(f1, f2) < 0);
     assertTrue("f2>f1", c.compare(f2, f1) > 0);

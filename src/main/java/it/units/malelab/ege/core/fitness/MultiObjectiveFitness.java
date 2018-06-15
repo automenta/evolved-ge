@@ -40,23 +40,20 @@ public class MultiObjectiveFitness<T extends Comparable<T>> implements Fitness<T
       return false;
     }
     final MultiObjectiveFitness other = (MultiObjectiveFitness) obj;
-    if (!Arrays.deepEquals(this.values, other.values)) {
-      return false;
-    }
-    return true;
+      return Arrays.deepEquals(this.values, other.values);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("[");
+    sb.append('[');
     for (int i = 0; i<values.length; i++) {
       if (i>0) {
         sb.append(", ");
       }
-      sb.append(values[i].toString());
+      sb.append(values[i]);
     }
-    sb.append("]");
+    sb.append(']');
     return sb.toString();
   }
 

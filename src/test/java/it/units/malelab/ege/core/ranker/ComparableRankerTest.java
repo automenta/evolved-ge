@@ -49,12 +49,7 @@ public class ComparableRankerTest {
    */
   @Test
   public void testRank() {
-    ComparableRanker instance = new ComparableRanker(new Comparator<Individual<?, ?, NumericFitness>>() {
-      @Override
-      public int compare(Individual<?, ?, NumericFitness> o1, Individual<?, ?, NumericFitness> o2) {
-        return o1.getFitness().compareTo(o2.getFitness());
-      }
-    });
+    Ranker<Individual<?, ?, NumericFitness>> instance = new ComparableRanker<>(Comparator.comparing((o) -> o.fitness));
     Individual<?, ?, NumericFitness> i0 = new Individual<>(null, null, new NumericFitness(0d), 0, null, null);
     Individual<?, ?, NumericFitness> i1 = new Individual<>(null, null, new NumericFitness(1d), 0, null, null);
     Individual<?, ?, NumericFitness> i2 = new Individual<>(null, null, new NumericFitness(2d), 0, null, null);
@@ -62,11 +57,11 @@ public class ComparableRankerTest {
     List<Individual<?, ?, NumericFitness>> pop = Arrays.asList(i0, i1, i2, i3);
     for (int i = 0; i < 5; i++) {
       List<List<Individual<?, ?, NumericFitness>>> ranked = instance.rank(pop, null);
-      assertEquals("i0 rank should be in list 0", true, ranked.get(0).contains(i0));
-      assertEquals("i1 rank should be in list 1", true, ranked.get(1).contains(i1));
-      assertEquals("i2 rank should be in list 2", true, ranked.get(2).contains(i2));
-      assertEquals("i3 rank should be in list 2", true, ranked.get(2).contains(i3));
-      Collections.shuffle(pop, new Random(1l));
+      assertTrue("i0 rank should be in list 0", ranked.get(0).contains(i0));
+      assertTrue("i1 rank should be in list 1", ranked.get(1).contains(i1));
+      assertTrue("i2 rank should be in list 2", ranked.get(2).contains(i2));
+      assertTrue("i3 rank should be in list 2", ranked.get(2).contains(i3));
+      Collections.shuffle(pop, new Random(1L));
     }
   }
 

@@ -117,20 +117,28 @@ public class GOM {
             keys.put(Master.RANDOM_SEED_NAME, run);
             //build problem
             Problem<String, NumericFitness> problem = null;
-            if (p(pr, 1).equals("parity")) {
-              problem = new Parity(i(p(pr, 2)));
-            } else if (p(pr, 1).equals("mopm")) {
-              problem = new MultipleOutputParallelMultiplier(i(p(pr, 2)));
-            } else if (p(pr, 1).equals("keijzer6")) {
-              problem = new HarmonicCurve();
-            } else if (p(pr, 1).equals("nguyen7")) {
-              problem = new Nguyen7(0);
-            } else if (p(pr, 1).equals("pagie1")) {
-              problem = new Pagie1();
-            } else if (p(pr, 1).equals("klandscapes")) {
-              problem = new KLandscapes(i(p(pr, 2)));
-            } else if (p(pr, 1).equals("text")) {
-              problem = new Text(textProblemTargetString.substring(0, i(p(pr, 2))));
+            switch (p(pr, 1)) {
+              case "parity":
+                problem = new Parity(i(p(pr, 2)));
+                break;
+              case "mopm":
+                problem = new MultipleOutputParallelMultiplier(i(p(pr, 2)));
+                break;
+              case "keijzer6":
+                problem = new HarmonicCurve();
+                break;
+              case "nguyen7":
+                problem = new Nguyen7(0);
+                break;
+              case "pagie1":
+                problem = new Pagie1();
+                break;
+              case "klandscapes":
+                problem = new KLandscapes(i(p(pr, 2)));
+                break;
+              case "text":
+                problem = new Text(textProblemTargetString.substring(0, i(p(pr, 2))));
+                break;
             }
             //build mapper, operators, initializer, genotype distance
             Mapper mapper = null;
@@ -139,28 +147,35 @@ public class GOM {
                     .put(new LengthPreservingTwoPointsCrossover(), 0.8d)
                     .put(mutation, 0.2d).build();
             PopulationInitializer populationInitializer = null;
-            if (p(ma, 0).equals("ge")) {
-              mapper = new StandardGEMapper(i(p(ma, 1)), i(p(ma, 2)), problem.getGrammar());
-              populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 3))));
-            } else if (p(ma, 0).equals("pige")) {
-              mapper = new PiGEMapper(i(p(ma, 1)), i(p(ma, 2)), problem.getGrammar());
-              populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 3))));
-            } else if (p(ma, 0).equals("hge")) {
-              mapper = new HierarchicalMapper(problem.getGrammar());
-              populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 1))));
-            } else if (p(ma, 0).equals("whge")) {
-              mapper = new WeightedHierarchicalMapper(i(p(ma, 1)), problem.getGrammar());
-              populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 2))));
-            } else if (p(ma, 0).equals("bitsge")) {
-              mapper = new BitsSGEMapper(i(p(ma, 1)), problem.getGrammar());
-              populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 2))));
-            } else if (p(ma, 0).equals("sge")) {
-              mapper = new SGEMapper(i(p(ma, 1)), problem.getGrammar());
-              mutation = new SGEMutation<>(0.01, (SGEMapper<String>) mapper);
-              operators = new Utils.MapBuilder<>()
-                      .put(new SGECrossover<>(), 0.8d)
-                      .put(mutation, 0.2d).build();
-              populationInitializer = new RandomInitializer<>(new SGEGenotypeFactory<>((SGEMapper<String>) mapper));
+            switch (p(ma, 0)) {
+              case "ge":
+                mapper = new StandardGEMapper(i(p(ma, 1)), i(p(ma, 2)), problem.getGrammar());
+                populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 3))));
+                break;
+              case "pige":
+                mapper = new PiGEMapper(i(p(ma, 1)), i(p(ma, 2)), problem.getGrammar());
+                populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 3))));
+                break;
+              case "hge":
+                mapper = new HierarchicalMapper(problem.getGrammar());
+                populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 1))));
+                break;
+              case "whge":
+                mapper = new WeightedHierarchicalMapper(i(p(ma, 1)), problem.getGrammar());
+                populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 2))));
+                break;
+              case "bitsge":
+                mapper = new BitsSGEMapper(i(p(ma, 1)), problem.getGrammar());
+                populationInitializer = new RandomInitializer<>(new BitsGenotypeFactory(i(p(ma, 2))));
+                break;
+              case "sge":
+                mapper = new SGEMapper(i(p(ma, 1)), problem.getGrammar());
+                mutation = new SGEMutation<>(0.01, (SGEMapper<String>) mapper);
+                operators = new Utils.MapBuilder<>()
+                        .put(new SGECrossover<>(), 0.8d)
+                        .put(mutation, 0.2d).build();
+                populationInitializer = new RandomInitializer<>(new SGEGenotypeFactory<>((SGEMapper<String>) mapper));
+                break;
             }
             //build configuration
             StandardConfiguration configuration = null;
@@ -184,20 +199,29 @@ public class GOM {
               );
             } else if (p(me, 0).equals("gom")) {
               FOSBuilder fosBuilder = null;
-              if (p(me, 1).equals("u")) {
-                fosBuilder = new Univariate();
-              } else if (p(me, 1).equals("nat")) {
-                if (p(ma, 0).equals("ge") || p(ma, 0).equals("pige")) {
-                  fosBuilder = new Grouped(i(p(ma, 1)));
-                } else if (p(ma, 0).equals("sge")) {
-                  fosBuilder = new SGEGeneBounds((SGEMapper) mapper);
-                } else {
-                  continue;
-                }
-              } else if (p(me, 1).equals("rt")) {
-                fosBuilder = new RandomTree(1, 0);
-              } else if (p(me, 1).equals("lt")) {
-                fosBuilder = new UPGMAMutualInformationTree(1, 0);
+              switch (p(me, 1)) {
+                case "u":
+                  fosBuilder = new Univariate();
+                  break;
+                case "nat":
+                  switch (p(ma, 0)) {
+                    case "ge":
+                    case "pige":
+                      fosBuilder = new Grouped(i(p(ma, 1)));
+                      break;
+                    case "sge":
+                      fosBuilder = new SGEGeneBounds((SGEMapper) mapper);
+                      break;
+                    default:
+                      continue;
+                  }
+                  break;
+                case "rt":
+                  fosBuilder = new RandomTree(1, 0);
+                  break;
+                case "lt":
+                  fosBuilder = new UPGMAMutualInformationTree(1, 0);
+                  break;
               }
               configuration = new GOMConfiguration(
                       fosBuilder,

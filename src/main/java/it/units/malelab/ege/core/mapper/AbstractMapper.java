@@ -16,7 +16,7 @@ public abstract class AbstractMapper<G, T> implements Mapper<G, T> {
 
   protected final Grammar<T> grammar;
 
-  public AbstractMapper(Grammar<T> grammar) {
+  protected AbstractMapper(Grammar<T> grammar) {
     this.grammar = grammar;
   }
 

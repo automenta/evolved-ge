@@ -13,10 +13,8 @@ import it.units.malelab.ege.core.fitness.BinaryClassification;
 import it.units.malelab.ege.core.fitness.FitnessComputer;
 import it.units.malelab.ege.core.fitness.MultiObjectiveFitness;
 import it.units.malelab.ege.core.listener.EvolverListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 
@@ -38,7 +36,7 @@ public class SACEvolver<I, G, T, F extends MultiObjectiveFitness> extends Partit
     Node<T> joined = null;
     BinaryClassification<I, T> allLearningFitness = (BinaryClassification<I, T>) configuration.getProblem().getLearningFitnessComputer();
     BinaryClassification<I, T> allTestingFitness = (BinaryClassification<I, T>) configuration.getProblem().getTestingFitnessComputer();
-    List<I> removedPositives = new ArrayList<>();
+    Collection<I> removedPositives = new ArrayList<>();
     int rounds = 0;
     while (true) {
       List<I> localPositives = new ArrayList<>(allLearningFitness.getPositives());

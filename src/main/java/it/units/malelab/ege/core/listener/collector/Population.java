@@ -14,6 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.collect.Iterables.size;
+
 /**
  *
  * @author eric
@@ -31,9 +33,9 @@ public class Population<G extends Sequence, T, F extends Fitness> implements Col
     for (List<Individual<G, T, F>> rank : rankedPopulation) {
       for (Individual<G, T, F> individual : rank) {
         count = count+1;
-        genoSizeSum = genoSizeSum+individual.getGenotype().size();
-        phenoSizeSum = phenoSizeSum+individual.getPhenotype().leafNodes().size();
-        birthDateSum = birthDateSum+individual.getBirthDate();
+        genoSizeSum = genoSizeSum+ individual.genotype.size();
+          phenoSizeSum = phenoSizeSum + size(individual.phenotype.leafNodes());
+        birthDateSum = birthDateSum+ individual.birthDate;
       }
     }
     indexes.put("population.genotype.size.average", (int)Math.round(genoSizeSum / count));
@@ -47,7 +49,7 @@ public class Population<G extends Sequence, T, F extends Fitness> implements Col
 
   @Override
   public Map<String, String> getFormattedNames() {
-    LinkedHashMap<String, String> formattedNames = new LinkedHashMap<>();
+    Map<String, String> formattedNames = new LinkedHashMap<>();
     formattedNames.put("population.size", "%5d");
     formattedNames.put("population.ranks", "%3d");
     formattedNames.put("population.rank0.size", "%3d");

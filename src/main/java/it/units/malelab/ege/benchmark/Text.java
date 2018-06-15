@@ -27,9 +27,9 @@ public class Text extends Problem<String, NumericFitness> {
 
   public Text(String target) throws IOException {
     super(Utils.parseFromFile(new File("grammars/text.bnf")),
-            new LeafContentsDistance<>(Utils.fromList(Arrays.asList(target.replace(" ", "_").split(""))), new Edit<String>()),
+            new LeafContentsDistance<>(Utils.from(Arrays.asList(target.replace(" ", "_").split(""))), new Edit<>()),
             null,
-            new LeavesJoiner<String>()
+            new LeavesJoiner<>()
     );
   }
 

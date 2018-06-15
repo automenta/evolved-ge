@@ -20,18 +20,12 @@ import it.units.malelab.ege.core.listener.event.EvolutionEndEvent;
 import it.units.malelab.ege.core.listener.event.EvolutionStartEvent;
 import it.units.malelab.ege.core.listener.event.GenerationEvent;
 import it.units.malelab.ege.core.listener.event.MappingEvent;
-import it.units.malelab.ege.core.operator.AbstractMutation;
+import it.units.malelab.ege.core.operator.GeneticOperator;
 import it.units.malelab.ege.core.ranker.Ranker;
 import it.units.malelab.ege.util.Pair;
 import it.units.malelab.ege.util.Utils;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -61,8 +55,8 @@ public class GOMEvolver<G extends ConstrainedSequence, T, F extends Fitness> ext
     LoadingCache<Node<T>, F> fitnessCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).recordStats().build(getFitnessCacheLoader());
     Stopwatch stopwatch = Stopwatch.createStarted();
     //initialize population
-    int births = 0;
-    List<Callable<List<Individual<G, T, F>>>> tasks = new ArrayList<>();
+    float births = 0;
+    Collection<Callable<List<Individual<G, T, F>>>> tasks = new ArrayList<>();
     for (G genotype : configuration.getPopulationInitializer().build(configuration.getPopulationSize(), configuration.getInitGenotypeValidator(), random)) {
       tasks.add(individualFromGenotypeCallable(genotype, 0, mappingCache, fitnessCache, listeners, null, null, executor));
       births = births + 1;
@@ -70,17 +64,17 @@ public class GOMEvolver<G extends ConstrainedSequence, T, F extends Fitness> ext
     List<Individual<G, T, F>> population = new ArrayList<>(Utils.getAll(executor.invokeAll(tasks)));
     Utils.broadcast(new EvolutionStartEvent<>(this, cacheStats(mappingCache, fitnessCache)), listeners, executor);
     Utils.broadcast(new GenerationEvent<>(configuration.getRanker().rank(population, random), (int) Math.floor(actualBirths(births, fitnessCache) / configuration.getPopulationSize()), this, cacheStats(mappingCache, fitnessCache)), listeners, executor);
-    Set<Individual<G, T, F>> bests = new LinkedHashSet<>();
+    Collection<Individual<G, T, F>> bests = new LinkedHashSet<>();
     //iterate
     while (Math.round(actualBirths(births, fitnessCache) / configuration.getPopulationSize()) < configuration.getNumberOfGenerations()) {
       //learn fos
       List<ConstrainedSequence> genotypes = new ArrayList<>(population.size());
       for (Individual<G, T, F> individual : population) {
-        genotypes.add(individual.getGenotype());
+        genotypes.add(individual.genotype);
       }
       Set<Set<Integer>> fos = configuration.getFosBuilder().build(genotypes, random);
       //apply gom
-      int lastIterationActualBirths = actualBirths(births, fitnessCache);
+//      float lastIterationActualBirths = actualBirths(births, fitnessCache);
       tasks.clear();
       for (Individual<G, T, F> individual : population) {
         tasks.add(gomCallable(
@@ -139,7 +133,7 @@ public class GOMEvolver<G extends ConstrainedSequence, T, F extends Fitness> ext
       }
       if (configuration.getProblem().getLearningFitnessComputer().bestValue() != null) {
         //check if optimal solution found
-        if (rankedPopulationWithBests.get(0).get(0).getFitness().equals(configuration.getProblem().getLearningFitnessComputer().bestValue())) {
+        if (rankedPopulationWithBests.get(0).get(0).fitness.equals(configuration.getProblem().getLearningFitnessComputer().bestValue())) {
           break;
         }
       }
@@ -151,99 +145,96 @@ public class GOMEvolver<G extends ConstrainedSequence, T, F extends Fitness> ext
     List<List<Individual<G, T, F>>> rankedPopulationWithBests = configuration.getRanker().rank(populationWithBests, random);
     Utils.broadcast(new EvolutionEndEvent<>((List) rankedPopulationWithBests, (int) Math.floor(births / configuration.getPopulationSize()), this, cacheStats(mappingCache, fitnessCache)), listeners, executor);
     for (Individual<G, T, F> individual : rankedPopulationWithBests.get(0)) {
-      bestPhenotypes.add(individual.getPhenotype());
+      bestPhenotypes.add(individual.phenotype);
     }
     return bestPhenotypes;
   }
 
-  protected Callable<List<Individual<G, T, F>>> gomCallable(
+  private Callable<List<Individual<G, T, F>>> gomCallable(
           final List<Individual<G, T, F>> population,
           final Individual<G, T, F> parent,
           final Set<Set<Integer>> fos,
           final Random random,
           final int generation,
           final Ranker<Individual<G, T, F>> ranker,
-          final AbstractMutation<G> mutationOperator,
+          final GeneticOperator<G> mutationOperator,
           final LoadingCache<G, Pair<Node<T>, Map<String, Object>>> mappingCache,
           final LoadingCache<Node<T>, F> fitnessCache,
           final int maxEvaluations,
-          final List<EvolverListener<G, T, F>> listeners,
+          final Iterable<EvolverListener<G, T, F>> listeners,
           final ExecutorService executor,
           final Stopwatch elapsedStopwatch
   ) {
     final Evolver<G, T, F> evolver = this;
-    return new Callable<List<Individual<G, T, F>>>() {
-      @Override
-      public List<Individual<G, T, F>> call() throws Exception {
-        try {
-          //randomize fos
-          List<Set<Integer>> randomizedFos = new ArrayList<>(fos);
-          Collections.shuffle(randomizedFos, random);
-          //iterate
-          Individual<G, T, F> child = parent;
-          for (Set<Integer> subset : fos) {
+    return () -> {
+      try {
+        //randomize fos
+        List<Set<Integer>> randomizedFos = new ArrayList<>(fos);
+        Collections.shuffle(randomizedFos, random);
+        //iterate
+        Individual<G, T, F> child = parent;
+        for (Set<Integer> subset: fos) {
+          //check evaluations
+          if (actualBirths(0, fitnessCache) > maxEvaluations) {
+            break;
+          }
+          if (configuration.getMaxElapsed() > 0) {
+            //check if elapsed time exceeded
+            if (elapsedStopwatch.elapsed(TimeUnit.SECONDS) > configuration.getMaxElapsed()) {
+              break;
+            }
+          }
+          //mix genes
+          Individual<G, T, F> donor = population.get(random.nextInt(population.size()));
+          G donorGenotype = donor.genotype;
+          G childGenotype = (G) child.genotype.clone();
+          for (Integer locus: subset) {
+            childGenotype.set(locus, donorGenotype.get(locus));
+          }
+          //map
+          Stopwatch stopwatch = Stopwatch.createStarted();
+          Pair<Node<T>, Map<String, Object>> mappingOutcome = mappingCache.getUnchecked(childGenotype);
+          Node<T> phenotype = mappingOutcome.first;
+          long elapsed = stopwatch.stop().elapsed(TimeUnit.NANOSECONDS);
+          Utils.broadcast(new MappingEvent<>(childGenotype, phenotype, elapsed, generation, evolver, null), listeners, executor);
+          //compute fitness
+          stopwatch.reset().start();
+          F fitness = fitnessCache.getUnchecked(phenotype);
+          elapsed = stopwatch.stop().elapsed(TimeUnit.NANOSECONDS);
+          Individual<G, T, F> individual = new Individual<>(childGenotype, phenotype, fitness, generation, saveAncestry ? Arrays.asList(child, donor) : null, mappingOutcome.second);
+          Utils.broadcast(new BirthEvent<>(individual, elapsed, generation, evolver, null), listeners, executor);
+          //rank
+          List<List<Individual<G, T, F>>> ranked = ranker.rank(Arrays.asList(child, individual), random);
+          child = ranked.get(0).get(0);
+        }
+        if (mutationOperator != null) {
+          while (child.phenotype.equals(parent.phenotype)) {
             //check evaluations
             if (actualBirths(0, fitnessCache) > maxEvaluations) {
               break;
             }
-            if (configuration.getMaxElapsed() > 0) {
-              //check if elapsed time exceeded
-              if (elapsedStopwatch.elapsed(TimeUnit.SECONDS) > configuration.getMaxElapsed()) {
-                break;
-              }
-            }
-            //mix genes
-            Individual<G, T, F> donor = population.get(random.nextInt(population.size()));
-            G donorGenotype = donor.getGenotype();
-            G childGenotype = (G) child.getGenotype().clone();
-            for (Integer locus : subset) {
-              childGenotype.set(locus, donorGenotype.get(locus));
-            }
+            //mutate
+            G childGenotype = mutationOperator.apply(Collections.singletonList(child.genotype), random).get(0);
             //map
             Stopwatch stopwatch = Stopwatch.createStarted();
             Pair<Node<T>, Map<String, Object>> mappingOutcome = mappingCache.getUnchecked(childGenotype);
-            Node<T> phenotype = mappingOutcome.getFirst();
+            Node<T> phenotype = mappingOutcome.first;
             long elapsed = stopwatch.stop().elapsed(TimeUnit.NANOSECONDS);
             Utils.broadcast(new MappingEvent<>(childGenotype, phenotype, elapsed, generation, evolver, null), listeners, executor);
             //compute fitness
             stopwatch.reset().start();
             F fitness = fitnessCache.getUnchecked(phenotype);
             elapsed = stopwatch.stop().elapsed(TimeUnit.NANOSECONDS);
-            Individual<G, T, F> individual = new Individual<>(childGenotype, phenotype, fitness, generation, saveAncestry ? Arrays.asList(child, donor) : null, mappingOutcome.getSecond());
+            Individual<G, T, F> individual = new Individual<>(childGenotype, phenotype, fitness, generation, saveAncestry ? Collections.singletonList(child) : null, mappingOutcome.second);
             Utils.broadcast(new BirthEvent<>(individual, elapsed, generation, evolver, null), listeners, executor);
-            //rank
-            List<List<Individual<G, T, F>>> ranked = ranker.rank(Arrays.asList(child, individual), random);
-            child = ranked.get(0).get(0);
+            child = individual;
           }
-          if (mutationOperator != null) {
-            while (child.getPhenotype().equals(parent.getPhenotype())) {
-              //check evaluations
-              if (actualBirths(0, fitnessCache) > maxEvaluations) {
-                break;
-              }
-              //mutate
-              G childGenotype = mutationOperator.apply(Collections.singletonList(child.getGenotype()), random).get(0);
-              //map
-              Stopwatch stopwatch = Stopwatch.createStarted();
-              Pair<Node<T>, Map<String, Object>> mappingOutcome = mappingCache.getUnchecked(childGenotype);
-              Node<T> phenotype = mappingOutcome.getFirst();
-              long elapsed = stopwatch.stop().elapsed(TimeUnit.NANOSECONDS);
-              Utils.broadcast(new MappingEvent<>(childGenotype, phenotype, elapsed, generation, evolver, null), listeners, executor);
-              //compute fitness
-              stopwatch.reset().start();
-              F fitness = fitnessCache.getUnchecked(phenotype);
-              elapsed = stopwatch.stop().elapsed(TimeUnit.NANOSECONDS);
-              Individual<G, T, F> individual = new Individual<>(childGenotype, phenotype, fitness, generation, saveAncestry ? Arrays.asList(child) : null, mappingOutcome.getSecond());
-              Utils.broadcast(new BirthEvent<>(individual, elapsed, generation, evolver, null), listeners, executor);
-              child = individual;
-            }
-          }
-          return Collections.singletonList(child);
-        } catch (Throwable t) {
-          t.printStackTrace();
-          System.exit(-1);
-          return null;
         }
+        return Collections.singletonList(child);
+      } catch (Throwable t) {
+        t.printStackTrace();
+        System.exit(-1);
+        return null;
       }
     };
   }

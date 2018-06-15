@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.math3.stat.correlation.PearsonsCorrelation;
 
 /**
  *
@@ -40,9 +39,10 @@ public class PropertiesListener<G, T, F extends Fitness> extends AbstractListene
 
   private boolean resetData = false;
 
-  private static enum CountType {
+  private enum CountType {
     MAPPING, INVALID, OPERATOR_APPLICATION, REDUNDANT, BETTER_FITNESS, VALID_OPERATOR_APPLICATION
-  };
+  }
+
   private final static String NO_OPERATOR = "_ALL";
 
   private final Comparator<F> fitnessComparator;
@@ -60,15 +60,15 @@ public class PropertiesListener<G, T, F extends Fitness> extends AbstractListene
     this.genotypeDistance = genotypeDistance;
     this.phenotypeDistance = phenotypeDistance;
     this.operatorNames = operatorNames;
-    partialDistances = (Map) Collections.synchronizedMap(new LinkedHashMap<>());
-    cumulativeDistances = (Map) Collections.synchronizedMap(new LinkedHashMap<>());
-    counts = (Map) Collections.synchronizedMap(new LinkedHashMap<>());
+    partialDistances = Collections.synchronizedMap(new LinkedHashMap<>());
+    cumulativeDistances = Collections.synchronizedMap(new LinkedHashMap<>());
+    counts = Collections.synchronizedMap(new LinkedHashMap<>());
     //reset data
     counts.put(NO_OPERATOR, (Multiset) ConcurrentHashMultiset.create());
     for (String operatorName : operatorNames.values()) {
       counts.put(operatorName, (Multiset) ConcurrentHashMultiset.create());
-      partialDistances.put(operatorName, Collections.synchronizedList(new ArrayList<Pair<Double, Double>>()));
-      cumulativeDistances.put(operatorName, Collections.synchronizedList(new ArrayList<Pair<Double, Double>>()));
+      partialDistances.put(operatorName, Collections.synchronizedList(new ArrayList<>()));
+      cumulativeDistances.put(operatorName, Collections.synchronizedList(new ArrayList<>()));
     }
   }
 
@@ -101,22 +101,22 @@ public class PropertiesListener<G, T, F extends Fitness> extends AbstractListene
         boolean differentGenotype = false;
         boolean allInvalid = true;
         //compute distances
-        for (Individual<G, T, F> child : operatorApplicationEvent.getChildren()) {
-          if (Node.EMPTY_TREE.equals(child.getPhenotype())) {
+        for (Individual<G, T, F> child : operatorApplicationEvent.children) {
+          if (Node.EMPTY_TREE.equals(child.phenotype)) {
             continue;
           }
           double minGenotypeDistance = Double.POSITIVE_INFINITY;
           double minPhenotypeDistance = Double.POSITIVE_INFINITY;
           for (Individual<G, T, F> parent : operatorApplicationEvent.getParents()) {
-            if (Node.EMPTY_TREE.equals(parent.getPhenotype())) {
+            if (Node.EMPTY_TREE.equals(parent.phenotype)) {
               continue;
             }
             allInvalid = false;
-            double localGenotypeDistance = genotypeDistance.d(parent.getGenotype(), child.getGenotype());
+            double localGenotypeDistance = genotypeDistance.d(parent.genotype, child.genotype);
             if (minGenotypeDistance > localGenotypeDistance) {
               minGenotypeDistance = localGenotypeDistance;
             }
-            double localPhenotypeDistance = phenotypeDistance.d(parent.getPhenotype(), child.getPhenotype());
+            double localPhenotypeDistance = phenotypeDistance.d(parent.phenotype, child.phenotype);
             if (minPhenotypeDistance > localPhenotypeDistance) {
               minPhenotypeDistance = localPhenotypeDistance;
             }
@@ -140,14 +140,14 @@ public class PropertiesListener<G, T, F extends Fitness> extends AbstractListene
         //compute best fitnesses
         F bestParentFitness = null;
         for (Individual<G, T, F> parent : operatorApplicationEvent.getParents()) {
-          if ((bestParentFitness == null) || (fitnessComparator.compare(parent.getFitness(), bestParentFitness) < 0)) {
-            bestParentFitness = parent.getFitness();
+            if ((bestParentFitness == null) || (fitnessComparator.compare(parent.fitness, bestParentFitness) < 0)) {
+                bestParentFitness = parent.fitness;
           }
         }
         F bestChildFitness = null;
-        for (Individual<G, T, F> child : operatorApplicationEvent.getChildren()) {
-          if ((bestChildFitness == null) || (fitnessComparator.compare(child.getFitness(), bestChildFitness) < 0)) {
-            bestChildFitness = child.getFitness();
+        for (Individual<G, T, F> child : operatorApplicationEvent.children) {
+            if ((bestChildFitness == null) || (fitnessComparator.compare(child.fitness, bestChildFitness) < 0)) {
+                bestChildFitness = child.fitness;
           }
         }
         //check evolvability
@@ -169,7 +169,7 @@ public class PropertiesListener<G, T, F extends Fitness> extends AbstractListene
 
   @Override
   public Map<String, String> getFormattedNames() {
-    LinkedHashMap<String, String> formattedNames = new LinkedHashMap<>();
+    Map<String, String> formattedNames = new LinkedHashMap<>();
     formattedNames.put("properties.mapping.invalidity", "%4.2f");
     formattedNames.put("properties.mapping.count", "%4d");
     for (String operatorName : operatorNames.values()) {
@@ -186,12 +186,12 @@ public class PropertiesListener<G, T, F extends Fitness> extends AbstractListene
   @Override
   public Map<String, Object> collect(GenerationEvent<G, T, F> generationEvent) {
     //compute aggregates
-    LinkedHashMap<String, Object> values = new LinkedHashMap<>();
-    values.put("properties.mapping.invalidity", (double) counts.get(NO_OPERATOR).count(CountType.INVALID) / (double) counts.get(NO_OPERATOR).count(CountType.MAPPING));
+    Map<String, Object> values = new LinkedHashMap<>();
+    values.put("properties.mapping.invalidity", (double) counts.get(NO_OPERATOR).count(CountType.INVALID) / counts.get(NO_OPERATOR).count(CountType.MAPPING));
     values.put("properties.mapping.count", counts.get(NO_OPERATOR).count(CountType.MAPPING));
     for (String operatorName : operatorNames.values()) {
       values.put("properties.operator." + operatorName + ".redundancy",
-              (double) counts.get(operatorName).count(CountType.REDUNDANT) / (double) counts.get(operatorName).count(CountType.VALID_OPERATOR_APPLICATION)
+              (double) counts.get(operatorName).count(CountType.REDUNDANT) / counts.get(operatorName).count(CountType.VALID_OPERATOR_APPLICATION)
       );
       values.put("properties.operator." + operatorName + ".locality",
               Utils.pearsonCorrelation(partialDistances.get(operatorName))
@@ -200,7 +200,7 @@ public class PropertiesListener<G, T, F extends Fitness> extends AbstractListene
               Utils.pearsonCorrelation(cumulativeDistances.get(operatorName))
       );
       values.put("properties.operator." + operatorName + ".evolvability",
-              (double) counts.get(operatorName).count(CountType.BETTER_FITNESS) / (double) counts.get(operatorName).count(CountType.OPERATOR_APPLICATION)
+              (double) counts.get(operatorName).count(CountType.BETTER_FITNESS) / counts.get(operatorName).count(CountType.OPERATOR_APPLICATION)
       );
       values.put("properties.operator." + operatorName + ".count",
               counts.get(operatorName).count(CountType.OPERATOR_APPLICATION)

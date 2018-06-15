@@ -5,11 +5,9 @@
  */
 package it.units.malelab.ege.distributed.master;
 
-import it.units.malelab.ege.core.fitness.Fitness;
 import it.units.malelab.ege.distributed.Job;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,7 +19,7 @@ public class MasterMessage implements Serializable {
   private final Set<Job> newJobs;
 
   public MasterMessage() {
-    this.newJobs = new HashSet<Job>();
+    this.newJobs = new HashSet<>();
   }
 
   public Set<Job> getNewJobs() {

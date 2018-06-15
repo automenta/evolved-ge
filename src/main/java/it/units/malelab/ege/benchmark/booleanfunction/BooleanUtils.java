@@ -23,24 +23,24 @@ import java.util.Map;
 public class BooleanUtils {
 
   public static boolean[] compute(Node<Element> node, Map<String, boolean[]> values, int length) {
-    if (node.getContent() instanceof Decoration) {
+    if (node.content instanceof Decoration) {
       return null;
     }
-    if (node.getContent() instanceof Variable) {
-      boolean[] result = values.get(node.getContent().toString());
+    if (node.content instanceof Variable) {
+      boolean[] result = values.get(node.content.toString());
       if (result == null) {
-        throw new RuntimeException(String.format("Undefined variable: %s", node.getContent().toString()));
+        throw new RuntimeException(String.format("Undefined variable: %s", node.content.toString()));
       }
       return result;
     }
     boolean[] result = new boolean[length];
-    if (node.getContent() instanceof Constant) {
-      Arrays.fill(result, ((Constant) node.getContent()).getValue());
+    if (node.content instanceof Constant) {
+      Arrays.fill(result, ((Constant) node.content).getValue());
       return result;
     }
-    boolean[][] childrenValues = new boolean[node.getChildren().size()][];
+    boolean[][] childrenValues = new boolean[node.children.size()][];
     int i = 0;
-    for (Node<Element> child : node.getChildren()) {
+    for (Node<Element> child : node.children) {
       boolean[] childValues = compute(child, values, length);
       if (childValues != null) {
         childrenValues[i] = childValues;
@@ -52,7 +52,7 @@ public class BooleanUtils {
       for (int k = 0; k < operands.length; k++) {
         operands[k] = childrenValues[k][j];
       }
-      result[j] = compute((Operator) node.getContent(), operands);
+      result[j] = compute((Operator) node.content, operands);
     }
     return result;
   }
@@ -76,15 +76,15 @@ public class BooleanUtils {
   }
 
   public static Node<Element> transform(Node<String> stringNode) {
-    if (stringNode.getChildren().isEmpty()) {
-      return new Node<>(fromString(stringNode.getContent()));
+    if (stringNode.children.isEmpty()) {
+      return new Node<>(fromString(stringNode.content));
     }
-    if (stringNode.getChildren().size() == 1) {
-      return transform(stringNode.getChildren().get(0));
+    if (stringNode.children.size() == 1) {
+      return transform(stringNode.children.get(0));
     }
-    Node<Element> node = transform(stringNode.getChildren().get(0));
-    for (int i = 1; i < stringNode.getChildren().size(); i++) {
-      node.getChildren().add(transform(stringNode.getChildren().get(i)));
+    Node<Element> node = transform(stringNode.children.get(0));
+    for (int i = 1; i < stringNode.children.size(); i++) {
+      node.children.add(transform(stringNode.children.get(i)));
     }
     return node;
   }
@@ -108,14 +108,11 @@ public class BooleanUtils {
   }
 
   public static PhenotypePrinter<String> phenotypePrinter() {
-    return new PhenotypePrinter<String>() {
-      @Override
-      public String toString(Node<String> node) {
-        if (Node.EMPTY_TREE.equals(node)) {
-          return null;
-        }
-        return transform(node).toString();
+    return (PhenotypePrinter<String>) node -> {
+      if (Node.EMPTY_TREE.equals(node)) {
+        return null;
       }
+      return transform(node).toString();
     };
   }
 

@@ -11,7 +11,7 @@ import it.units.malelab.ege.ge.genotype.BitsGenotype;
 import it.units.malelab.ege.core.Node;
 import it.units.malelab.ege.core.Grammar;
 import static it.units.malelab.ege.ge.mapper.StandardGEMapper.BIT_USAGES_INDEX_NAME;
-import it.units.malelab.ege.util.Utils;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +43,7 @@ public class PiGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
     while (true) {
       List<Node<T>> nodesToBeReplaced = new ArrayList<>();
       for (Node<T> leaf : tree.leafNodes()) {
-        if (grammar.getRules().keySet().contains(leaf.getContent())) {
+          if (((Map<T, List<List<T>>>) grammar).keySet().contains(leaf.content)) {
           nodesToBeReplaced.add(leaf);
         }
       }
@@ -60,7 +60,7 @@ public class PiGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
       }
       int nodeIndexCodon = genotype.slice(currentCodonIndex*codonLenght, currentCodonIndex*codonLenght+codonLenght/2).toInt()%nodesToBeReplaced.size();
       Node<T> nodeToBeReplaced = nodesToBeReplaced.get(nodeIndexCodon);
-      List<List<T>> options = grammar.getRules().get(nodeToBeReplaced.getContent());
+        List<List<T>> options = ((Map<T, List<List<T>>>) grammar).get(nodeToBeReplaced.content);
       int optionIndex = genotype.slice(currentCodonIndex*codonLenght+codonLenght/2, (currentCodonIndex+1)*codonLenght).toInt()%options.size();
       /*
       //System.out.printf("i=%3d g_i^nont=%3d n_s=%3d j^nont=%3d g_i^rule=%3d |r_s|=%2d j^rule=%2d w=%2d %s:%s %s%n",
@@ -85,7 +85,7 @@ public class PiGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
       //add children
       for (T t : options.get(optionIndex)) {
         Node<T> newChild = new Node<>(t);
-        nodeToBeReplaced.getChildren().add(newChild);
+        nodeToBeReplaced.children.add(newChild);
       }
       currentCodonIndex = currentCodonIndex+1;
     }

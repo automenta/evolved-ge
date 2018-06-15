@@ -11,7 +11,6 @@ import it.units.malelab.ege.cfggp.initializer.GrowTreeFactory;
 import it.units.malelab.ege.cfggp.mapper.CfgGpMapper;
 import it.units.malelab.ege.cfggp.operator.StandardTreeCrossover;
 import it.units.malelab.ege.cfggp.operator.StandardTreeMutation;
-import it.units.malelab.ege.core.Individual;
 import it.units.malelab.ege.core.evolver.Evolver;
 import it.units.malelab.ege.core.Problem;
 import it.units.malelab.ege.core.fitness.NumericFitness;
@@ -28,14 +27,13 @@ import it.units.malelab.ege.core.evolver.StandardConfiguration;
 import it.units.malelab.ege.core.evolver.StandardEvolver;
 import it.units.malelab.ege.core.initializer.MultiInitializer;
 import it.units.malelab.ege.core.initializer.PopulationInitializer;
-import it.units.malelab.ege.ge.genotype.BitsGenotype;
 import it.units.malelab.ege.core.initializer.RandomInitializer;
 import it.units.malelab.ege.core.listener.collector.BestPrinter;
 import it.units.malelab.ege.core.validator.Any;
 import it.units.malelab.ege.core.operator.GeneticOperator;
 import it.units.malelab.ege.core.ranker.ComparableRanker;
 import it.units.malelab.ege.util.Utils;
-import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,12 +48,12 @@ import java.util.concurrent.Executors;
  */
 public class ExampleMain {
 
-  public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
+  public static void main(String[] args) throws InterruptedException, ExecutionException {
     solveKLandscapesCfgGp();
   }
 
-  private static void solveKLandscapesCfgGp() throws IOException, InterruptedException, ExecutionException {
-    Random random = new Random(1l);
+  private static void solveKLandscapesCfgGp() throws InterruptedException, ExecutionException {
+    Random random = new Random(1L);
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
     Problem<String, NumericFitness> problem = new KLandscapes(8);
     int maxDepth = 16;
@@ -67,15 +65,15 @@ public class ExampleMain {
                     .put(new RandomInitializer<>(new FullTreeFactory<>(maxDepth, problem.getGrammar())), 0.5)
                     .build()
             ),
-            new Any<Node<String>>(),
-            new CfgGpMapper<String>(),
+            new Any<>(),
+            new CfgGpMapper<>(),
             new Utils.MapBuilder<GeneticOperator<Node<String>>, Double>()
-            .put(new StandardTreeCrossover<String>(maxDepth), 0.8d)
+            .put(new StandardTreeCrossover<>(maxDepth), 0.8d)
             .put(new StandardTreeMutation<>(maxDepth, problem.getGrammar()), 0.2d)
             .build(),
-            new ComparableRanker<>(new IndividualComparator<Node<String>, String, NumericFitness>(IndividualComparator.Attribute.FITNESS)),
-            new Tournament<Individual<Node<String>, String, NumericFitness>>(3),
-            new LastWorst<Individual<Node<String>, String, NumericFitness>>(),
+            new ComparableRanker<>(new IndividualComparator<>(IndividualComparator.Attribute.FITNESS)),
+            new Tournament<>(3),
+            new LastWorst<>(),
             500,
             true,
             problem,
@@ -83,11 +81,11 @@ public class ExampleMain {
             -1, -1);
     List<EvolverListener<Node<String>, String, NumericFitness>> listeners = new ArrayList<>();
     listeners.add(new CollectorGenerationLogger<>(
-            Collections.EMPTY_MAP, System.out, true, 10, " ", " | ",
-            new Population<BitsGenotype, String, NumericFitness>(),
-            new NumericFirstBest<BitsGenotype, String>(false, problem.getTestingFitnessComputer(), "%6.2f"),
-            new Diversity<BitsGenotype, String, NumericFitness>(),
-            new BestPrinter<BitsGenotype, String, NumericFitness>(problem.getPhenotypePrinter(), "%30.30s")
+            Collections.emptyMap(), System.out, true, 10, " ", " | ",
+            new Population<>(),
+            new NumericFirstBest<>(false, problem.getTestingFitnessComputer(), "%6.2f"),
+            new Diversity<>(),
+            new BestPrinter<>(problem.getPhenotypePrinter(), "%30.30s")
     ));
     Evolver<Node<String>, String, NumericFitness> evolver = new StandardEvolver<>(configuration, false);
     List<Node<String>> bests = evolver.solve(executor, random, listeners);

@@ -33,21 +33,21 @@ public class PopulationPrinter<G extends BitsGenotype, T, F extends Fitness> ext
 
   @Override
   public void listen(EvolutionEvent<G, T, F> event) {
-    int generation = ((GenerationEvent) event).getGeneration();
+    int generation = event.getGeneration();
     ps.printf("Population at generation %d%n", generation);
     List<List<Individual<G, T, F>>> rankedPopulation = ((GenerationEvent) event).getRankedPopulation();
     for (List<Individual<G, T, F>> rank : rankedPopulation) {
       for (Individual<G, T, F> individual : rank) {
-        G genotype = individual.getGenotype();
+        G genotype = individual.genotype;
         //genotype
-        int[] bitUsages = (int[]) individual.getOtherInfo().get(StandardGEMapper.BIT_USAGES_INDEX_NAME);
+        int[] bitUsages = (int[]) individual.otherInfo.get(StandardGEMapper.BIT_USAGES_INDEX_NAME);
         if (bitUsages == null) {
           bitUsages = new int[genotype.size()];
         }
         for (int i = 0; i < genotype.size(); i++) {
           ps.print(CHARS[bitUsages[i] > 0 ? 0 : 1][genotype.get(i) ? 0 : 1]);
         }
-        ps.printf(" -> %s%n", Utils.contents(individual.getPhenotype().leafNodes()));
+          ps.printf(" -> %s%n", Utils.contents(individual.phenotype.leafNodes()));
       }
     }
   }

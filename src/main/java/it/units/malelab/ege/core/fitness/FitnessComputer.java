@@ -14,8 +14,8 @@ import java.io.Serializable;
  */
 public interface FitnessComputer<T, F extends Fitness> extends Serializable {
   
-  public F compute(Node<T> phenotype);
-  public F worstValue();
-  public F bestValue();
+  F compute(Node<T> phenotype);
+  F worstValue();
+  F bestValue();
   
 }

@@ -9,7 +9,6 @@ import it.units.malelab.ege.core.Node;
 import it.units.malelab.ege.core.Sequence;
 import it.units.malelab.ege.util.Utils;
 import it.units.malelab.ege.util.distance.Distance;
-import java.util.List;
 
 /**
  *
@@ -27,7 +26,7 @@ public class LeafContentsDistance<T> implements FitnessComputer<T, NumericFitnes
 
   @Override
   public NumericFitness compute(Node<T> phenotype) {
-    double d = distance.d(Utils.fromList(Utils.contents(phenotype.leafNodes())), target);
+    double d = distance.d(Utils.from(Utils.contents(phenotype.leafNodes())), target);
     return new NumericFitness(d);
   }
 

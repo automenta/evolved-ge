@@ -13,6 +13,6 @@ import java.io.Serializable;
  */
 public interface PhenotypePrinter<T> extends Serializable {
   
-  public String toString(Node<T> node);
+  String toString(Node<T> node);
   
 }

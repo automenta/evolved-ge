@@ -6,6 +6,7 @@
 package it.units.malelab.ege.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -47,13 +48,11 @@ public class LineArgsUtils {
   public static List<String> l(String s) {
     List<String> l = new ArrayList<>();
     String[] pieces = s.split(OPTIONS_SEP);
-    for (String piece : pieces) {
-      l.add(piece);
-    }
+      Collections.addAll(l, pieces);
     return l;
   }
   
-  public static List<Integer> i(List<String> strings) {
+  public static List<Integer> i(Iterable<String> strings) {
     List<Integer> ints = new ArrayList<>();
     for (String string : strings) {
       ints.add(Integer.parseInt(string));

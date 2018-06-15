@@ -18,8 +18,8 @@ import java.io.Serializable;
  */
 public interface Configuration<G, T, F extends Fitness> extends Serializable {
   
-  public Problem<T, F> getProblem();
-  public Mapper<G, T> getMapper();
-  public Ranker<Individual<G, T, F>> getRanker();
+  Problem<T, F> getProblem();
+  Mapper<G, T> getMapper();
+  Ranker<Individual<G, T, F>> getRanker();
   
 }

@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public interface Collector<G, T, F extends Fitness> extends Serializable {
   
-  public Map<String, String> getFormattedNames();
-  public Map<String, Object> collect(GenerationEvent<G, T, F> generationEvent);  
+  Map<String, String> getFormattedNames();
+  Map<String, Object> collect(GenerationEvent<G, T, F> generationEvent);
   
 }

@@ -42,10 +42,7 @@ public class Constant implements Element {
       return false;
     }
     final Constant other = (Constant) obj;
-    if (Double.doubleToLongBits(this.value) != Double.doubleToLongBits(other.value)) {
-      return false;
-    }
-    return true;
+      return Double.doubleToLongBits(this.value) == Double.doubleToLongBits(other.value);
   }
   
 }

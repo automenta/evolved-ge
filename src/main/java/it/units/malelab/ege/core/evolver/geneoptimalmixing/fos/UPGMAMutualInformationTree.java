@@ -10,7 +10,6 @@ import it.units.malelab.ege.core.Sequence;
 import it.units.malelab.ege.util.Pair;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -55,21 +54,21 @@ public class UPGMAMutualInformationTree implements FOSBuilder {
     while (currentSubsets.size() > 1) {
       Set<Integer> newSubset = new LinkedHashSet<>();
       Pair<Pair<Set<Integer>, Set<Integer>>, Double> chosenScoredSubsets = choosePair(currentSubsets, dMap);
-      final Set<Integer> firstSubset = chosenScoredSubsets.getFirst().getFirst();
-      final Set<Integer> secondSubset = chosenScoredSubsets.getFirst().getSecond();
+        final Set<Integer> firstSubset = chosenScoredSubsets.first.first;
+      final Set<Integer> secondSubset = chosenScoredSubsets.first.second;
       newSubset.addAll(firstSubset);
       newSubset.addAll(secondSubset);
       currentSubsets.remove(firstSubset);
       currentSubsets.remove(secondSubset);
       currentSubsets.add(newSubset);
       if (newSubset.size() >= minSubsetSize) {
-        scoredFos.put(newSubset, chosenScoredSubsets.getSecond());
+        scoredFos.put(newSubset, chosenScoredSubsets.second);
       }
       //new distance in map
       for (Set<Integer> subset : currentSubsets) {
         if (!subset.equals(newSubset)) {
-          double d = (double) firstSubset.size() / (double) newSubset.size() * dMap.getOrDefault(new Pair<>(subset, firstSubset), 1d);
-          d = d + (double) secondSubset.size() / (double) newSubset.size() * dMap.getOrDefault(new Pair<>(subset, secondSubset), 1d);
+          double d = (double) firstSubset.size() / newSubset.size() * dMap.getOrDefault(new Pair<>(subset, firstSubset), 1d);
+          d = d + (double) secondSubset.size() / newSubset.size() * dMap.getOrDefault(new Pair<>(subset, secondSubset), 1d);
           dMap.put(new Pair<>(subset, newSubset), d);
           dMap.put(new Pair<>(newSubset, subset), d);
         }
@@ -78,12 +77,7 @@ public class UPGMAMutualInformationTree implements FOSBuilder {
     Set<Set<Integer>> fos = new LinkedHashSet<>();
     if (limit > 0) {
       List<Set<Integer>> sortedFos = new ArrayList<>(scoredFos.keySet());
-      Collections.sort(sortedFos, new Comparator<Set<Integer>>() {
-        @Override
-        public int compare(Set<Integer> s1, Set<Integer> s2) {
-          return Double.compare(scoredFos.get(s2), scoredFos.get(s1));
-        }
-      });
+      sortedFos.sort((s1, s2) -> Double.compare(scoredFos.get(s2), scoredFos.get(s1)));
       fos.addAll(sortedFos.subList(0, Math.min(sortedFos.size(), limit)));
     } else {
       fos.addAll(scoredFos.keySet());
@@ -91,7 +85,7 @@ public class UPGMAMutualInformationTree implements FOSBuilder {
     return fos;
   }
 
-  protected Map<Pair<Set<Integer>, Set<Integer>>, Double> computeInitialDistanceMap(int minMaxIndex, List<ConstrainedSequence> sequences, Random random) {
+  Map<Pair<Set<Integer>, Set<Integer>>, Double> computeInitialDistanceMap(int minMaxIndex, List<ConstrainedSequence> sequences, Random random) {
     Map<Pair<Set<Integer>, Set<Integer>>, Double> map = new LinkedHashMap<>();
     List<List<Object>> domains = new ArrayList<>();
     for (int i = 0; i < minMaxIndex; i++) {
@@ -113,7 +107,7 @@ public class UPGMAMutualInformationTree implements FOSBuilder {
     return map;
   }
 
-  private Pair<Pair<Set<Integer>, Set<Integer>>, Double> choosePair(
+  private static Pair<Pair<Set<Integer>, Set<Integer>>, Double> choosePair(
           Set<Set<Integer>> subsets,
           Map<Pair<Set<Integer>, Set<Integer>>, Double> miMap) {
     List<Set<Integer>> list = new ArrayList<>(subsets);
@@ -134,7 +128,7 @@ public class UPGMAMutualInformationTree implements FOSBuilder {
     return new Pair<>(new Pair<>(list.get(bestI), list.get(bestJ)), bestMi);
   }
 
-  private double computeMI(Object[] aValues, List<Object> aDomain, Object[] bValues, List<Object> bDomain) {
+  private static double computeMI(Object[] aValues, List<Object> aDomain, Object[] bValues, List<Object> bDomain) {
     int[] a = new int[aValues.length];
     for (int i = 0; i < aValues.length; i++) {
       a[i] = aDomain.indexOf(aValues[i]);
@@ -157,7 +151,7 @@ public class UPGMAMutualInformationTree implements FOSBuilder {
    * @param tvals number of values a can take (max(t) == tvals)
    * @return
    */
-  private double computeMI(int[] a, int avals, int[] t, int tvals) {
+  private static double computeMI(int[] a, int avals, int[] t, int tvals) {
     double numinst = a.length;
     double oneovernuminst = 1 / numinst;
     double sum = 0;

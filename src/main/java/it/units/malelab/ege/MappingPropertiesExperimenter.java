@@ -23,7 +23,6 @@ import it.units.malelab.ege.core.Sequence;
 import it.units.malelab.ege.core.fitness.NumericFitness;
 import it.units.malelab.ege.core.mapper.Mapper;
 import it.units.malelab.ege.core.mapper.MappingException;
-import it.units.malelab.ege.ge.genotype.BitsGenotype;
 import it.units.malelab.ege.ge.genotype.BitsGenotypeFactory;
 import it.units.malelab.ege.ge.genotype.SGEGenotype;
 import it.units.malelab.ege.ge.genotype.SGEGenotypeFactory;
@@ -40,15 +39,8 @@ import it.units.malelab.ege.util.distance.Hamming;
 import it.units.malelab.ege.util.distance.LeavesEdit;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.concurrent.ExecutionException;
+import java.util.*;
+
 import org.apache.commons.math3.stat.StatUtils;
 
 /**
@@ -57,7 +49,7 @@ import org.apache.commons.math3.stat.StatUtils;
  */
 public class MappingPropertiesExperimenter {
 
-  public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
+  public static void main(String[] args) throws IOException {
     final int n = 10000;
     final int nDist = 10000;
     //prepare problems and methods
@@ -67,7 +59,7 @@ public class MappingPropertiesExperimenter {
             "other-klandscapes3", "other-klandscapes7",
             "other-text"
     );
-    List<String> mappers = new ArrayList<>();
+    Collection<String> mappers = new ArrayList<>();
     for (int gs : new int[]{64, 128, 256, 512, 1024}) {
       mappers.add("ge-" + gs + "-2");
       mappers.add("ge-" + gs + "-4");
@@ -96,7 +88,7 @@ public class MappingPropertiesExperimenter {
     }
     filePrintStream.printf("problem;mapper;genotypeSize;param;property;value%n");
     //prepare distances
-    Distance<Node<String>> phenotypeDistance = new CachedDistance<>(new LeavesEdit<String>());
+    Distance<Node<String>> phenotypeDistance = new CachedDistance<>(new LeavesEdit<>());
     Distance<Sequence> genotypeDistance = new CachedDistance<>(new Hamming());
     //iterate
     for (String problemName : problems) {
@@ -104,43 +96,59 @@ public class MappingPropertiesExperimenter {
         System.out.printf("%20.20s, %20.20s", problemName, mapperName);
         //build problem
         Problem<String, NumericFitness> problem = null;
-        if (problemName.equals("bool-parity5")) {
-          problem = new Parity(5);
-        } else if (problemName.equals("bool-mopm3")) {
-          problem = new MultipleOutputParallelMultiplier(3);
-        } else if (problemName.equals("sr-keijzer6")) {
-          problem = new HarmonicCurve();
-        } else if (problemName.equals("sr-nguyen7")) {
-          problem = new Nguyen7(1);
-        } else if (problemName.equals("sr-pagie1")) {
-          problem = new Pagie1();
-        } else if (problemName.equals("sr-vladislavleva4")) {
-          problem = new Vladislavleva4(1);
-        } else if (problemName.equals("other-klandscapes3")) {
-          problem = new KLandscapes(3);
-        } else if (problemName.equals("other-klandscapes7")) {
-          problem = new KLandscapes(7);
-        } else if (problemName.equals("other-text")) {
-          problem = new Text();
+        switch (problemName) {
+          case "bool-parity5":
+            problem = new Parity(5);
+            break;
+          case "bool-mopm3":
+            problem = new MultipleOutputParallelMultiplier(3);
+            break;
+          case "sr-keijzer6":
+            problem = new HarmonicCurve();
+            break;
+          case "sr-nguyen7":
+            problem = new Nguyen7(1);
+            break;
+          case "sr-pagie1":
+            problem = new Pagie1();
+            break;
+          case "sr-vladislavleva4":
+            problem = new Vladislavleva4(1);
+            break;
+          case "other-klandscapes3":
+            problem = new KLandscapes(3);
+            break;
+          case "other-klandscapes7":
+            problem = new KLandscapes(7);
+            break;
+          case "other-text":
+            problem = new Text();
+            break;
         }
         //build configuration and evolver
         Mapper mapper = null;
         int genotypeSize = Integer.parseInt(mapperName.split("-")[1]);
         int mapperMainParam = Integer.parseInt(mapperName.split("-")[2]);
-        if (mapperName.split("-")[0].equals("ge")) {
-          mapper = new StandardGEMapper<>(mapperMainParam, 1, problem.getGrammar());
-        } else if (mapperName.split("-")[0].equals("pige")) {
-          mapper = new PiGEMapper<>(mapperMainParam, 1, problem.getGrammar());
-        } else if (mapperName.split("-")[0].equals("sge")) {
-          mapper = new SGEMapper<>(mapperMainParam, problem.getGrammar());
-        } else if (mapperName.split("-")[0].equals("hge")) {
-          mapper = new HierarchicalMapper<>(problem.getGrammar());
-        } else if (mapperName.split("-")[0].equals("whge")) {
-          mapper = new WeightedHierarchicalMapper<>(mapperMainParam, false, true, problem.getGrammar());
+        switch (mapperName.split("-")[0]) {
+          case "ge":
+            mapper = new StandardGEMapper<>(mapperMainParam, 1, problem.getGrammar());
+            break;
+          case "pige":
+            mapper = new PiGEMapper<>(mapperMainParam, 1, problem.getGrammar());
+            break;
+          case "sge":
+            mapper = new SGEMapper<>(mapperMainParam, problem.getGrammar());
+            break;
+          case "hge":
+            mapper = new HierarchicalMapper<>(problem.getGrammar());
+            break;
+          case "whge":
+            mapper = new WeightedHierarchicalMapper<>(mapperMainParam, false, true, problem.getGrammar());
+            break;
         }
         //prepare things
         Random random = new Random(1);
-        Set<Sequence> genotypes = new LinkedHashSet<>(n);
+        Collection<Sequence> genotypes = new LinkedHashSet<>(n);
         //build genotypes
         if (mapperName.split("-")[0].equals("sge")) {
           SGEGenotypeFactory<String> factory = new SGEGenotypeFactory<>((SGEMapper) mapper);
@@ -163,14 +171,14 @@ public class MappingPropertiesExperimenter {
             if (mapperName.split("-")[0].equals("sge")) {
               phenotype = mapper.map((SGEGenotype<String>) genotype, new HashMap<>());
             } else {
-              phenotype = mapper.map((BitsGenotype) genotype, new HashMap<>());
+              phenotype = mapper.map(genotype, new HashMap<>());
             }
           } catch (MappingException e) {
             phenotype = Node.EMPTY_TREE;
           }
           multimap.put(phenotype, genotype);
           progress = progress+1;
-          if (progress % Math.round(n/10) == 0) {
+          if (progress % Math.round(n/10f) == 0) {
             System.out.print(".");
           }          
         }
@@ -212,11 +220,11 @@ public class MappingPropertiesExperimenter {
           }
         }
         //compute properties
-        double invalidity = (double) multimap.get(Node.EMPTY_TREE).size() / (double) genotypes.size();
-        double redundancy = 1 - (double) multimap.keySet().size() / (double) genotypes.size();
+        double invalidity = (double) multimap.get(Node.EMPTY_TREE).size() / genotypes.size();
+        double redundancy = 1 - (double) multimap.keySet().size() / genotypes.size();
         double validRedundancy = redundancy;
         if (multimap.keySet().contains(Node.EMPTY_TREE)) {
-          validRedundancy = 1 - ((double) multimap.keySet().size() - 1d) / (double) (genotypes.size() - multimap.get(Node.EMPTY_TREE).size());
+          validRedundancy = 1 - (multimap.keySet().size() - 1d) / (genotypes.size() - multimap.get(Node.EMPTY_TREE).size());
         }
         double locality = Utils.pearsonCorrelation(allDistances);
         double validLocality = Utils.pearsonCorrelation(allValidDistances);
@@ -274,7 +282,7 @@ public class MappingPropertiesExperimenter {
   private static double[] firsts(List<Pair<Double, Double>> pairs) {
     double[] values = new double[pairs.size()];
     for (int i = 0; i < values.length; i++) {
-      values[i] = pairs.get(i).getFirst();
+      values[i] = pairs.get(i).first;
     }
     return values;
   }

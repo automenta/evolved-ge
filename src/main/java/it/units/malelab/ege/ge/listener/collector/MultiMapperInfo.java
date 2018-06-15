@@ -37,23 +37,23 @@ public class MultiMapperInfo<G extends BitsGenotype, T, F extends Fitness> imple
     double count = 0;
     for (List<Individual<G, T, F>> rank : rankedPopulation) {
       for (Individual<G, T, F> individual : rank) {
-        Integer index = (Integer) individual.getOtherInfo().get(MultiMapper.MAPPER_INDEX_NAME);
+          Integer index = (Integer) individual.otherInfo.get(MultiMapper.MAPPER_INDEX_NAME);
         if (index != null) {
           counts[index] = counts[index] + 1;
           count = count + 1;
         }
       }
     }
-    indexes.put("best.multimapper.i", best.getOtherInfo().get(MultiMapper.MAPPER_INDEX_NAME));
+      indexes.put("best.multimapper.i", best.otherInfo.get(MultiMapper.MAPPER_INDEX_NAME));
     for (int i = 0; i < mappers; i++) {
-      indexes.put("pop.multimapper.freq." + i, (double) counts[i] / count);
+      indexes.put("pop.multimapper.freq." + i, counts[i] / count);
     }
     return indexes;
   }
 
   @Override
   public Map<String, String> getFormattedNames() {
-    LinkedHashMap<String, String> formattedNames = new LinkedHashMap<>();
+    Map<String, String> formattedNames = new LinkedHashMap<>();
     formattedNames.put("best.multimapper.i", "%1d");
     for (int i = 0; i < mappers; i++) {
       formattedNames.put("pop.multimapper.freq." + i, "%4.2f");

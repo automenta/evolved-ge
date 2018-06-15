@@ -13,6 +13,6 @@ import java.io.Serializable;
  */
 public interface Element extends Serializable {
   
-  public String toString();
+  String toString();
   
 }

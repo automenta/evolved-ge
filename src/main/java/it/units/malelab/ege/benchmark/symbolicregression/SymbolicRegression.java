@@ -16,9 +16,9 @@ import java.util.Map;
  */
 public class SymbolicRegression implements FitnessComputer<String, NumericFitness> {
   
-  public static interface TargetFunction {
-    public double compute(double... arguments);
-    public String[] varNames();
+  public interface TargetFunction {
+    double compute(double... arguments);
+    String[] varNames();
   }
   
   private final double[] targetValues;
@@ -26,7 +26,7 @@ public class SymbolicRegression implements FitnessComputer<String, NumericFitnes
 
   public SymbolicRegression(TargetFunction targetFunction, Map<String, double[]> varValues) {
     this.varValues = varValues;
-    targetValues = new double[varValues.get((String)varValues.keySet().toArray()[0]).length];
+    targetValues = new double[varValues.get(varValues.keySet().toArray()[0]).length];
     for (int i = 0; i<targetValues.length; i++) {
       double[] arguments = new double[varValues.keySet().size()];
       for (int j = 0; j<targetFunction.varNames().length; j++) {

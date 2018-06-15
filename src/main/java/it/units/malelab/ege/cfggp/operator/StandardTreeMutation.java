@@ -21,7 +21,7 @@ import java.util.Random;
 public class StandardTreeMutation<T>  extends AbstractMutation<Node<T>> {
   
   private final int maxDepth;
-  private GrowTreeFactory<T> factory;
+  private final GrowTreeFactory<T> factory;
 
   public StandardTreeMutation(int maxDepth, Grammar<T> grammar) {
     this.maxDepth = maxDepth;
@@ -36,10 +36,10 @@ public class StandardTreeMutation<T>  extends AbstractMutation<Node<T>> {
     Collections.shuffle(nonTerminalNodes, random);
     boolean done = false;
     for (Node<T> toReplaceSubTree : nonTerminalNodes) {
-      Node<T> newSubTree = factory.build(random, toReplaceSubTree.getContent(), toReplaceSubTree.depth());
+      Node<T> newSubTree = factory.build(random, toReplaceSubTree.content, toReplaceSubTree.depth());
       if (newSubTree!=null) {
-        toReplaceSubTree.getChildren().clear();
-        toReplaceSubTree.getChildren().addAll(newSubTree.getChildren());
+        toReplaceSubTree.children.clear();
+        toReplaceSubTree.children.addAll(newSubTree.children);
         done = true;
         break;
       }
@@ -51,9 +51,9 @@ public class StandardTreeMutation<T>  extends AbstractMutation<Node<T>> {
   }
   
   private void getNonTerminalNodes(Node<T> node, List<Node<T>> nodes) {
-    if (!node.getChildren().isEmpty()) {
+    if (!node.children.isEmpty()) {
       nodes.add(node);
-      for (Node<T> child : node.getChildren()) {
+      for (Node<T> child : node.children) {
         getNonTerminalNodes(child, nodes);
       }
     }

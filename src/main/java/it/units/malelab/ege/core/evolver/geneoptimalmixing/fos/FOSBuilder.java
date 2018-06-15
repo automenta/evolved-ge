@@ -17,6 +17,6 @@ import java.util.Set;
  */
 public interface FOSBuilder extends Serializable {
   
-  public Set<Set<Integer>> build(List<ConstrainedSequence> sequences, Random random);
+  Set<Set<Integer>> build(List<ConstrainedSequence> sequences, Random random);
   
 }

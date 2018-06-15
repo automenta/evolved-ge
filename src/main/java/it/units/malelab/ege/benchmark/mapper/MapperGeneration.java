@@ -34,12 +34,13 @@ public class MapperGeneration extends Problem<String, MultiObjectiveFitness<Doub
     super(Utils.parseFromFile(new File("grammars/mapper.bnf")),
             new MappingPropertiesFitness(genotypeSize, n, maxMappingDepth, random, problems, properties),
             null,
-            new PhenotypePrinter<String>() {
-              private PhenotypePrinter<String> innerPhenotypePrinter = new LeavesJoiner<>();
-              @Override
-              public String toString(Node<String> node) {
-                return innerPhenotypePrinter.toString(node.getChildren().get(0))+"&"+innerPhenotypePrinter.toString(node.getChildren().get(1));
-              }
+            new PhenotypePrinter<>() {
+                private final PhenotypePrinter<String> innerPhenotypePrinter = new LeavesJoiner<>();
+
+                @Override
+                public String toString(Node<String> node) {
+                    return innerPhenotypePrinter.toString(node.children.get(0)) + '&' + innerPhenotypePrinter.toString(node.children.get(1));
+                }
             }
     );
 

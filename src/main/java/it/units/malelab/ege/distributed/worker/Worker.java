@@ -15,7 +15,6 @@ import it.units.malelab.ege.distributed.master.Master;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,10 +32,10 @@ import java.util.logging.Logger;
  *
  * @author eric
  */
-public class Worker implements Runnable {
+public final class Worker implements Runnable {
 
-  public final static int MASTER_INTERVAL = 5;
-  public final static int STATS_INTERVAL = 1;
+  private final static int MASTER_INTERVAL = 5;
+  private final static int STATS_INTERVAL = 1;
 
   private final String keyPhrase;
   private final InetAddress masterAddress;
@@ -56,7 +55,7 @@ public class Worker implements Runnable {
 
   private final static Logger L = Logger.getLogger(Worker.class.getName());
 
-  public Worker(String keyPhrase, InetAddress masterAddress, int masterPort, int nThreads, String logDirectoryName) {
+  private Worker(String keyPhrase, InetAddress masterAddress, int masterPort, int nThreads, String logDirectoryName) {
     this.keyPhrase = keyPhrase;
     this.masterAddress = masterAddress;
     this.masterPort = masterPort;
@@ -64,17 +63,17 @@ public class Worker implements Runnable {
     comExecutor = Executors.newSingleThreadScheduledExecutor();
     taskExecutor = Executors.newFixedThreadPool(nThreads);
     runExecutor = Executors.newCachedThreadPool();
-    currentJobsData = (Multimap) Multimaps.synchronizedMultimap(ArrayListMultimap.create());
-    currentJobs = Collections.synchronizedSet(new HashSet<Job>());
-    completedJobsResults = Collections.synchronizedMap(new HashMap<Job, List<Node>>());
-    stats = (Multimap) Multimaps.synchronizedMultimap(ArrayListMultimap.create());
+    currentJobsData = Multimaps.synchronizedMultimap(ArrayListMultimap.create());
+    currentJobs = Collections.synchronizedSet(new HashSet<>());
+    completedJobsResults = Collections.synchronizedMap(new HashMap<>());
+    stats = Multimaps.synchronizedMultimap(ArrayListMultimap.create());
     name = ManagementFactory.getRuntimeMXBean().getName();
     interval = MASTER_INTERVAL;
     printStreamFactory = new PrintStreamFactory(logDirectoryName);
   }
 
   //java -cp target/EvolvedGrammaticalEvolution-1.0-SNAPSHOT.jar:. it.units.malelab.ege.distributed.worker.Worker hi 127.0.0.1 9000 2 ~/experiments/ge/dist/log/
-  public static void main(String[] args) throws UnknownHostException, IOException, ClassNotFoundException {
+  public static void main(String[] args) throws IOException {
     LogManager.getLogManager().readConfiguration(Master.class.getClassLoader().getResourceAsStream("logging.properties"));
     String keyPhrase = args[0];
     InetAddress masterAddress = InetAddress.getByName(args[1]);
@@ -87,7 +86,7 @@ public class Worker implements Runnable {
     if (args.length > 4) {
       logDir = args[4];
     }
-    Worker worker = new Worker(keyPhrase, masterAddress, masterPort, nThreads, logDir);
+    Runnable worker = new Worker(keyPhrase, masterAddress, masterPort, nThreads, logDir);
     worker.run();
   }
 

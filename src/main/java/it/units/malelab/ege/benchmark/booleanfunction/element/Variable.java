@@ -40,10 +40,7 @@ public class Variable implements Element {
       return false;
     }
     final Variable other = (Variable) obj;
-    if (!Objects.equals(this.string, other.string)) {
-      return false;
-    }
-    return true;
+      return Objects.equals(this.string, other.string);
   }
   
 }

@@ -16,7 +16,7 @@ import java.util.LinkedHashMap;
  *
  * @author eric
  */
-public class Poly4 extends Problem<String, NumericFitness> {
+class Poly4 extends Problem<String, NumericFitness> {
 
   private final static SymbolicRegression.TargetFunction TARGET_FUNCTION = new SymbolicRegression.TargetFunction() {
     @Override

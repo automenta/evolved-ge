@@ -7,10 +7,9 @@ package it.units.malelab.ege.benchmark;
 
 import it.units.malelab.ege.core.Node;
 import it.units.malelab.ege.util.Pair;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
+
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -42,13 +41,13 @@ public class KLandscapesTest {
     w.put(new Pair<>("n1", "t1"), 0.8);
     tree1 = new Node<>("t0");
     tree2 = new Node<>("n0");
-    tree2.getChildren().add(new Node<>("t0"));
-    tree2.getChildren().add(new Node<>("t1"));
+    tree2.children.add(new Node<>("t0"));
+    tree2.children.add(new Node<>("t1"));
     tree3 = new Node<>("n0");
-    tree3.getChildren().add(new Node<>("t0"));
-    tree3.getChildren().add(new Node<>("n1"));
-    tree3.getChildren().get(1).getChildren().add(new Node<>("t0"));
-    tree3.getChildren().get(1).getChildren().add(new Node<>("t1"));
+    tree3.children.add(new Node<>("t0"));
+    tree3.children.add(new Node<>("n1"));
+    tree3.children.get(1).children.add(new Node<>("t0"));
+    tree3.children.get(1).children.add(new Node<>("t1"));
   }
 
   @Test
@@ -73,7 +72,7 @@ public class KLandscapesTest {
   @Test
   public void testOptimum() {
     for (int k = 0; k < 4; k++) {
-      List<Node<String>> all = new ArrayList<>();
+      Collection<Node<String>> all = new ArrayList<>();
       for (int l = 1; l<=k+1; l++) {
         all.addAll(buildAllTrees(l, 2, 2));
       }
@@ -91,7 +90,7 @@ public class KLandscapesTest {
     }
   }
 
-  private List<Node<String>> buildAllTrees(int depth, int nTerminals, int nNonTerminals) {
+  private static List<Node<String>> buildAllTrees(int depth, int nTerminals, int nNonTerminals) {
     //assume arity==2 for simplicity
     List<Node<String>> all = new ArrayList<>();
     if (depth == 1) {
@@ -104,8 +103,8 @@ public class KLandscapesTest {
         for (Node<String> leftChild : subtrees) {
           for (Node<String> rigthChild : subtrees) {
             Node<String> node = new Node<>("n" + i);
-            node.getChildren().add(leftChild);
-            node.getChildren().add(rigthChild);
+              node.children.add(leftChild);
+              node.children.add(rigthChild);
             all.add(node);
           }
         }
@@ -119,24 +118,24 @@ public class KLandscapesTest {
     int[] indexes = new int[]{0, 1, 2};
     int arity = 2;
     Node<String> t = new Node<>("n0");
-    t.getChildren().add(new Node<>("n1"));
-    t.getChildren().add(new Node<>("n1"));
-    t.getChildren().get(0).getChildren().add(new Node<>("t2"));
-    t.getChildren().get(0).getChildren().add(new Node<>("t2"));
-    t.getChildren().get(1).getChildren().add(new Node<>("t2"));
-    t.getChildren().get(1).getChildren().add(new Node<>("t2"));
+      t.children.add(new Node<>("n1"));
+      t.children.add(new Node<>("n1"));
+      t.children.get(0).children.add(new Node<>("t2"));
+      t.children.get(0).children.add(new Node<>("t2"));
+    t.children.get(1).children.add(new Node<>("t2"));
+    t.children.get(1).children.add(new Node<>("t2"));
     Node<String> result = KLandscapes.levelEqualTree(indexes, arity);
     assertEquals("Tree should be " + t, t, result);
   }
 
   @Test
   public void testMaxFK() {
-    List<Node<String>> subtrees = new ArrayList<>();
+    Collection<Node<String>> subtrees = new ArrayList<>();
     subtrees.add(tree3);
-    subtrees.add(tree3.getChildren().get(0));
-    subtrees.add(tree3.getChildren().get(1));
-    subtrees.add(tree3.getChildren().get(1).getChildren().get(0));
-    subtrees.add(tree3.getChildren().get(1).getChildren().get(1));
+    subtrees.add(tree3.children.get(0));
+    subtrees.add(tree3.children.get(1));
+    subtrees.add(tree3.children.get(1).children.get(0));
+    subtrees.add(tree3.children.get(1).children.get(1));
     for (int k = 0; k < 5; k++) {
       double maxFk = Double.NEGATIVE_INFINITY;
       for (Node<String> subtree : subtrees) {
@@ -145,7 +144,7 @@ public class KLandscapesTest {
           maxFk = fK;
         }
       }
-      assertEquals("maxFK(" + tree3 + "," + k + ") should be " + maxFk, maxFk, KLandscapes.maxFK(tree3, k, v, w), 0.0001);
+      assertEquals("maxFK(" + tree3 + ',' + k + ") should be " + maxFk, maxFk, KLandscapes.maxFK(tree3, k, v, w), 0.0001);
     }
   }
 

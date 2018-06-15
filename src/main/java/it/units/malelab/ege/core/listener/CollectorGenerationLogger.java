@@ -16,8 +16,6 @@ import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  *
@@ -65,7 +63,7 @@ public class CollectorGenerationLogger<G, T, F extends Fitness> extends Abstract
 
   @Override
   public void listen(EvolutionEvent<G, T, F> event) {
-    int generation = ((GenerationEvent) event).getGeneration();
+    int generation = event.getGeneration();
     if ((headerInterval == 0 && lines == 0) || ((headerInterval > 0) && ((generation - 1) % headerInterval == 0))) {
       //print header: generation
       ps.print(format ? "gen" : "generation");
@@ -103,8 +101,8 @@ public class CollectorGenerationLogger<G, T, F extends Fitness> extends Abstract
     ps.print(outerSeparator);
     //print values: constants
     int k = 0;
-    for (String name : constants.keySet()) {
-      ps.print(Utils.pad(constants.get(name).toString(), name.length(), format));
+    for (Map.Entry<String, Object> stringObjectEntry: constants.entrySet()) {
+      ps.print(Utils.pad(stringObjectEntry.getValue().toString(), (stringObjectEntry.getKey()).length(), format));
       if (k != constants.size() - 1) {
         ps.print(innerSeparator);
       }

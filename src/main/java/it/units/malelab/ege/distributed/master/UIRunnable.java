@@ -34,7 +34,7 @@ import java.util.logging.Logger;
  *
  * @author eric
  */
-public class UIRunnable implements Runnable {
+class UIRunnable implements Runnable {
 
   private final Screen screen;
   private final Master master;
@@ -74,7 +74,7 @@ public class UIRunnable implements Runnable {
         int cx = 1, cy = 1; //clients
         int ojx = 1, ojy = h / 2 + 1; //ongoing jobs
         int lx = 1, ly = h - 1 - LOG_QUEUE_SIZE; //logs
-        int jix = w / 2 + 1, jiy = cy; //jobs
+        int jix = w / 2 + 1;  //jobs
         //draw lines
         TextGraphics g = screen.newTextGraphics();
         g.setForegroundColor(TextColor.ANSI.BLUE);
@@ -104,7 +104,7 @@ public class UIRunnable implements Runnable {
         g.putString(lx + 1, ly - 1, "Log");
         try {
           printClients(g, cx, cy, Math.round(w / 2) - 1, Math.round(h / 2) - 1);
-          printJobs(g, jix, jiy, Math.round(w / 2) - 1, Math.round(h / 2) - 1);
+          printJobs(g, jix, cy, Math.round(w / 2) - 1, Math.round(h / 2) - 1);
           printOngoingJobs(g, ojx, ojy, w, Math.round(h / 2) - 1 - LOG_QUEUE_SIZE - 1);
           printLogs(g, lx, ly, w, LOG_QUEUE_SIZE);
         } catch (ConcurrentModificationException ex) {
@@ -169,11 +169,11 @@ public class UIRunnable implements Runnable {
     Map<String, String> collectorKeyFormats = new TreeMap<>();
     collectorKeyFormats.put(GENERATION_NAME, "%3d");
     int nOngoingJobs = 0;
-    List<JobInfo> jobInfos = new ArrayList<>();
+    List<JobInfo> jobInfos;
     synchronized (master.getJobs()) {
-      jobInfos.addAll(master.getJobs().values());
-    };
-    for (JobInfo jobInfo : jobInfos) {
+      jobInfos = new ArrayList<>(master.getJobs().values());
+    }
+      for (JobInfo jobInfo : jobInfos) {
       if (!jobInfo.getStatus().equals(JobInfo.Status.ONGOING)) {
         continue;
       }
@@ -243,7 +243,7 @@ public class UIRunnable implements Runnable {
       if (!jobInfo.getData().isEmpty()) {
         g.setForegroundColor(TextColor.ANSI.WHITE);
         Map<String, Object> currentData = jobInfo.getData().get(jobInfo.getData().size() - 1);
-        Map<String, Object> previousData = Collections.EMPTY_MAP;
+        Map<String, Object> previousData = Collections.emptyMap();
         if (jobInfo.getData().size() > 1) {
           previousData = jobInfo.getData().get(jobInfo.getData().size() - 2);
         }
@@ -310,14 +310,14 @@ public class UIRunnable implements Runnable {
       }
     }
     int y = 2;
-    for (String keyName : allKeyCounts.keySet()) {
+    for (Map.Entry<String, Map<Object, Multiset<JobInfo.Status>>> stringMapEntry: allKeyCounts.entrySet()) {
       g.setForegroundColor(TextColor.ANSI.WHITE);
-      putString(g, 0, y, x0, y0, w, h, keyName + ":");
+      putString(g, 0, y, x0, y0, w, h, stringMapEntry.getKey() + ':');
       y = y + 1;
       int x = 2;
-      for (Object keyValue : allKeyCounts.get(keyName).keySet()) {
-        Multiset<JobInfo.Status> statuses = allKeyCounts.get(keyName).get(keyValue);
-        double completionRate = (double) statuses.count(JobInfo.Status.DONE) / (double) (statuses.size());
+      for (Object keyValue : stringMapEntry.getValue().keySet()) {
+        Multiset<JobInfo.Status> statuses = stringMapEntry.getValue().get(keyValue);
+        double completionRate = (double) statuses.count(JobInfo.Status.DONE) / (statuses.size());
         if (x >= w - 1) {
           x = 2;
           y = y + 1;
@@ -390,12 +390,8 @@ public class UIRunnable implements Runnable {
     }
   }
 
-  private void inc(String keyName, Object keyValue, JobInfo.Status status, Map<String, Map<Object, Multiset<JobInfo.Status>>> map) {
-    Map<Object, Multiset<JobInfo.Status>> valueCounts = map.get(keyName);
-    if (valueCounts == null) {
-      valueCounts = new TreeMap<>();
-      map.put(keyName, valueCounts);
-    }
+  private static void inc(String keyName, Object keyValue, JobInfo.Status status, Map<String, Map<Object, Multiset<JobInfo.Status>>> map) {
+    Map<Object, Multiset<JobInfo.Status>> valueCounts = map.computeIfAbsent(keyName, k -> new TreeMap<>());
     Multiset<JobInfo.Status> statuses = valueCounts.get(keyValue);
     if (statuses == null) {
       statuses = HashMultiset.create();
@@ -404,7 +400,7 @@ public class UIRunnable implements Runnable {
     statuses.add(status);
   }
 
-  private void putString(TextGraphics g, int x, int y, int x0, int y0, int w, int h, String s) {
+  private static void putString(TextGraphics g, int x, int y, int x0, int y0, int w, int h, String s) {
     if ((x >= w - 1) || (y >= h)) {
       return;
     }

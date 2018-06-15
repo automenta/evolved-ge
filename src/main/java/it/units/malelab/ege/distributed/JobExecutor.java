@@ -15,6 +15,6 @@ import java.util.concurrent.Future;
  */
 public interface JobExecutor {
   
-  public Future<List<Node>> submit(final Job job);
+  Future<List<Node>> submit(final Job job);
   
 }

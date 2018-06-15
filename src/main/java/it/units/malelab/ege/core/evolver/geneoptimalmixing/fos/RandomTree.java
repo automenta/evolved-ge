@@ -7,7 +7,7 @@ package it.units.malelab.ege.core.evolver.geneoptimalmixing.fos;
 
 import it.units.malelab.ege.core.ConstrainedSequence;
 import it.units.malelab.ege.util.Pair;
-import java.util.ArrayList;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;

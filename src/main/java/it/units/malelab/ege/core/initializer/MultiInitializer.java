@@ -31,9 +31,9 @@ public class MultiInitializer<G> implements PopulationInitializer<G> {
     }
     List<G> population = new ArrayList<>();
     for (Map.Entry<PopulationInitializer<G>, Double> entry : initializers.entrySet()) {
-      int localN = (int)Math.round(entry.getValue()/sum*(double)n);
+      int localN = (int)Math.round(entry.getValue()/sum* n);
       if (localN>0) {
-        population.addAll(entry.getKey().build((int)Math.round(entry.getValue()/sum*(double)n), genotypeValidator, random));
+        population.addAll(entry.getKey().build((int)Math.round(entry.getValue()/sum* n), genotypeValidator, random));
       }
     }
     if (population.size()>n) {

@@ -36,7 +36,7 @@ public class Job<G, T, F extends Fitness> implements Serializable {
     this.keys = keys;
     this.estimatedMaxThreads = estimatedMaxThreads;
     this.sendResults = sendResults;
-    id = UUID.randomUUID().toString()+"-"+atomicInteger.incrementAndGet();
+    id = UUID.randomUUID() +"-"+atomicInteger.incrementAndGet();
   }
 
   public Configuration<G, T, F> getConfiguration() {
@@ -71,10 +71,7 @@ public class Job<G, T, F extends Fitness> implements Serializable {
       return false;
     }
     final Job<?, ?, ?> other = (Job<?, ?, ?>) obj;
-    if (!Objects.equals(this.id, other.id)) {
-      return false;
-    }
-    return true;
+      return Objects.equals(this.id, other.id);
   }
 
   @Override

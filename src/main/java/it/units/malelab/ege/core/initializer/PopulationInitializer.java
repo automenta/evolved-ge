@@ -16,6 +16,6 @@ import java.util.Random;
  */
 public interface PopulationInitializer<G> extends Serializable {
     
-  public List<G> build(int n, Validator<G> genotypeValidator, Random random);
+  List<G> build(int n, Validator<G> genotypeValidator, Random random);
   
 }

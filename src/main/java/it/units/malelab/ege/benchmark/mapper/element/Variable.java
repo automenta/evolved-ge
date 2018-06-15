@@ -18,7 +18,7 @@ public enum Variable implements Element {
   
   private final String grammarName;
 
-  private Variable(String grammarName) {
+  Variable(String grammarName) {
     this.grammarName = grammarName;
   }
 

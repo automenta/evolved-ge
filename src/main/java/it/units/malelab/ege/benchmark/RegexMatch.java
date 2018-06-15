@@ -6,18 +6,15 @@
 package it.units.malelab.ege.benchmark;
 
 import it.units.malelab.ege.core.fitness.BinaryClassification;
-import it.units.malelab.ege.core.Node;
 import it.units.malelab.ege.util.Utils;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.Random;
-import java.util.Set;
+
+import java.util.*;
 
 /**
  *
  * @author eric
  */
-public class RegexMatch extends BinaryClassification<String, String> {
+class RegexMatch extends BinaryClassification<String, String> {
 
   private final String alphabet;
   private final int maxLength;
@@ -26,25 +23,22 @@ public class RegexMatch extends BinaryClassification<String, String> {
 
   public RegexMatch(String alphabet, int maxLength, int size, Random random, String... regexes) {
     super(
-            new ArrayList<String>(),
-            new ArrayList<String>(),
-            new Classifier<String, String>() {
-      @Override
-      public boolean classify(String instance, Node<String> classifier) {
-        StringBuilder sb = new StringBuilder();
-        for (String leaf : Utils.contents(classifier.leafNodes())) {
-          sb.append(leaf);
-        }
-        return instance.matches(sb.toString());
-      }
-    }
+            new ArrayList<>(),
+            new ArrayList<>(),
+            (instance, classifier) -> {
+              StringBuilder sb = new StringBuilder();
+              for (String leaf: Utils.contents(classifier.leafNodes())) {
+                sb.append(leaf);
+              }
+              return instance.matches(sb.toString());
+            }
     );
     this.alphabet = alphabet;
     this.maxLength = maxLength;
     this.size = size;
     this.regexes = regexes;
     //generate strings    
-    Set<String> strings = new LinkedHashSet<>();
+    Collection<String> strings = new LinkedHashSet<>();
     while (strings.size() < size) {
       int length = random.nextInt(maxLength - 1) + 1;
       StringBuilder sb = new StringBuilder();

@@ -15,8 +15,8 @@ import java.util.Random;
  */
 public interface GeneticOperator<G> extends Serializable {
   
-  public List<G> apply(List<G> parents, Random random);
-  public int getParentsArity();
-  public int getChildrenArity();
+  List<G> apply(List<G> parents, Random random);
+  int getParentsArity();
+  int getChildrenArity();
   
 }

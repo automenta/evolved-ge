@@ -26,7 +26,7 @@ public class LengthChanger extends AbstractMutation<BitsGenotype> {
   @Override
   public List<BitsGenotype> apply(List<BitsGenotype> parents, Random random) {
     BitsGenotype parent = parents.get(0);
-    int newBits = (int)Math.round((double)parent.size()*random.nextDouble()*maxRatio);
+    int newBits = (int)Math.round(parent.size() *random.nextDouble()*maxRatio);
     if (newBits==0) {
       return Collections.singletonList(new BitsGenotype(parent.size(), parent.asBitSet()));
     }

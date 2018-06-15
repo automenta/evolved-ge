@@ -28,7 +28,7 @@ public class MultiObjectiveFitnessFirstBest<G extends Sequence, T, O extends Com
   protected Map<String, String> getFitnessFormattedNames() {
     Map<String, String> formattedNames = new LinkedHashMap<>();
     for (int i = 0; i<fitnessFormats.length; i++) {
-      formattedNames.put(""+i, fitnessFormats[i]);
+      formattedNames.put(String.valueOf(i), fitnessFormats[i]);
     }
     return formattedNames;
   }
@@ -37,7 +37,7 @@ public class MultiObjectiveFitnessFirstBest<G extends Sequence, T, O extends Com
   protected Map<String, Object> getFitnessIndexes(MultiObjectiveFitness<O> fitness) {
     Map<String, Object> indexes = new LinkedHashMap<>();
     for (int i = 0; i<Math.min(fitnessFormats.length, fitness.getValue().length); i++) {
-      indexes.put(""+i, fitness.getValue()[i]);
+      indexes.put(String.valueOf(i), fitness.getValue()[i]);
     }
     return indexes;
   }

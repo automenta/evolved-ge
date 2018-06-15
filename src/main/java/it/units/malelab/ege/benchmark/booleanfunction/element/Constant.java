@@ -45,10 +45,7 @@ public class Constant implements Element {
       return false;
     }
     final Constant other = (Constant) obj;
-    if (this.value != other.value) {
-      return false;
-    }
-    return true;
+      return this.value == other.value;
   }
   
 }

@@ -15,7 +15,7 @@ import java.util.logging.Logger;
  *
  * @author eric
  */
-public class ServerRunnable implements Runnable {
+class ServerRunnable implements Runnable {
 
   private final Master master;
 

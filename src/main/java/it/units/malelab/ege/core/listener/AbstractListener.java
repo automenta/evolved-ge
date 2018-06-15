@@ -7,6 +7,8 @@ package it.units.malelab.ege.core.listener;
 
 import it.units.malelab.ege.core.fitness.Fitness;
 import it.units.malelab.ege.core.listener.event.EvolutionEvent;
+
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -20,9 +22,7 @@ public abstract class AbstractListener<G, T, F extends Fitness> implements Evolv
 
   public AbstractListener(Class<? extends EvolutionEvent>... localEventClasses) {
     eventClasses = new LinkedHashSet<>();
-    for (Class<? extends EvolutionEvent> eventClass : localEventClasses) {
-      eventClasses.add(eventClass);
-    }
+      Collections.addAll(eventClasses, localEventClasses);
   }
 
   @Override

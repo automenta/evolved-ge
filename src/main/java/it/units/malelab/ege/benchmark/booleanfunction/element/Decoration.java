@@ -40,10 +40,7 @@ public class Decoration implements Element {
       return false;
     }
     final Decoration other = (Decoration) obj;
-    if (!Objects.equals(this.string, other.string)) {
-      return false;
-    }
-    return true;
+      return Objects.equals(this.string, other.string);
   }
   
 }

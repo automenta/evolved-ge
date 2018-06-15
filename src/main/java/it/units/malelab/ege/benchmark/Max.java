@@ -19,25 +19,25 @@ import java.util.Collections;
  *
  * @author eric
  */
-public class Max extends Problem<String, NumericFitness> {
+class Max extends Problem<String, NumericFitness> {
 
   public Max() throws IOException {
     super(Utils.parseFromFile(new File("grammars/max-grammar.bnf")),
-            new FitnessComputer<String, NumericFitness>() {
-              @Override
-              public NumericFitness compute(Node<String> phenotype) {
-                return new NumericFitness(-MathUtils.compute(MathUtils.transform(phenotype), Collections.EMPTY_MAP, 1)[0]);
-              }
+            new FitnessComputer<>() {
+                @Override
+                public NumericFitness compute(Node<String> phenotype) {
+                    return new NumericFitness(-MathUtils.compute(MathUtils.transform(phenotype), Collections.emptyMap(), 1)[0]);
+                }
 
-              @Override
-              public NumericFitness worstValue() {
-                return new NumericFitness(Double.POSITIVE_INFINITY);
-              }
+                @Override
+                public NumericFitness worstValue() {
+                    return new NumericFitness(Double.POSITIVE_INFINITY);
+                }
 
-              @Override
-              public NumericFitness bestValue() {
-                return null;
-              }
+                @Override
+                public NumericFitness bestValue() {
+                    return null;
+                }
             },
             null,
             MathUtils.phenotypePrinter());

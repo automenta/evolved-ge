@@ -35,7 +35,7 @@ public class WeightedHierarchicalMapper<T> extends HierarchicalMapper<T> {
     this.weightOptions = weightOptions;
     this.weightChildren = weightChildren;
     weightsMap = new HashMap<>();
-    for (List<List<T>> options : grammar.getRules().values()) {
+      for (List<List<T>> options : ((Map<T, List<List<T>>>) grammar).values()) {
       for (List<T> option : options) {
         for (T symbol : option) {
           if (!weightsMap.keySet().contains(symbol)) {
@@ -44,15 +44,15 @@ public class WeightedHierarchicalMapper<T> extends HierarchicalMapper<T> {
         }
       }
     }
-    for (T symbol : weightsMap.keySet()) {
-      int options = weightsMap.get(symbol);
+    for (Map.Entry<T, Integer> tIntegerEntry: weightsMap.entrySet()) {
+      int options = tIntegerEntry.getValue();
       int bits = (int) Math.ceil(Math.log10(options) / Math.log10(2d));
-      weightsMap.put(symbol, bits);
+      weightsMap.put(tIntegerEntry.getKey(), bits);
     }
   }
 
   private int countOptions(T symbol, int level, int maxLevel) {
-    List<List<T>> options = grammar.getRules().get(symbol);
+      List<List<T>> options = ((Map<T, List<List<T>>>) grammar).get(symbol);
     if (options == null) {
       return 1;
     }
@@ -86,7 +86,7 @@ public class WeightedHierarchicalMapper<T> extends HierarchicalMapper<T> {
         overallWeight = overallWeight + weightsMap.get(symbol);
       }
       for (T symbol : symbols) {
-        sizes.add((int) Math.floor((double) weightsMap.get(symbol) / (double) overallWeight * (double) (range.upperEndpoint() - range.lowerEndpoint())));
+        sizes.add((int) Math.floor((double) weightsMap.get(symbol) / overallWeight * (range.upperEndpoint() - range.lowerEndpoint())));
       }
       ranges = Utils.slices(range, sizes);
     }
@@ -98,7 +98,7 @@ public class WeightedHierarchicalMapper<T> extends HierarchicalMapper<T> {
     if (!weightOptions) {
       return super.optionSliceWeigth(slice);
     }
-    return (double) slice.count();
+    return slice.count();
   }
 
   @Override

@@ -11,6 +11,6 @@ package it.units.malelab.ege.core.fitness;
  */
 public interface Fitness<T> {
   
-  public T getValue();
+  T getValue();
     
 }

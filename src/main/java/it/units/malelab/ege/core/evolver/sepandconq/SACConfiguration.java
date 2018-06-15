@@ -9,7 +9,6 @@ import it.units.malelab.ege.core.Individual;
 import it.units.malelab.ege.core.Problem;
 import it.units.malelab.ege.core.validator.Validator;
 import it.units.malelab.ege.core.evolver.PartitionConfiguration;
-import it.units.malelab.ege.core.fitness.BinaryClassification;
 import it.units.malelab.ege.core.fitness.MultiObjectiveFitness;
 import it.units.malelab.ege.core.initializer.PopulationInitializer;
 import it.units.malelab.ege.core.mapper.Mapper;

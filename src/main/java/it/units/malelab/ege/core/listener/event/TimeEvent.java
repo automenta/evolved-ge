@@ -13,11 +13,11 @@ import java.util.Map;
  *
  * @author eric
  */
-public class TimeEvent<G, T, F extends Fitness> extends EvolutionEvent<G, T, F> {
+class TimeEvent<G, T, F extends Fitness> extends EvolutionEvent<G, T, F> {
   
   private final long elapsedNanos;
 
-  public TimeEvent(long elapsedNanos, int generation, Evolver<G, T, F> evolver, Map<String, Object> data) {
+  TimeEvent(long elapsedNanos, int generation, Evolver<G, T, F> evolver, Map<String, Object> data) {
     super(generation, evolver, data);
     this.elapsedNanos = elapsedNanos;
   }

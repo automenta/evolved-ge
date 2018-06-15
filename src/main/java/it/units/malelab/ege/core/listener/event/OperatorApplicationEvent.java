@@ -19,7 +19,7 @@ import java.util.Map;
 public class OperatorApplicationEvent<G, T, F extends Fitness> extends TimeEvent<G, T, F> {
   
   private final List<Individual<G, T, F>> parents;
-  private final List<Individual<G, T, F>> children;
+  public final List<Individual<G, T, F>> children;
   private final GeneticOperator operator;
 
   public OperatorApplicationEvent(List<Individual<G, T, F>> parents, List<Individual<G, T, F>> children, GeneticOperator operator, long elapsedNanos, int generation, Evolver<G, T, F> evolver, Map<String, Object> data) {

@@ -18,9 +18,9 @@ import java.util.Map;
  */
 public class JobInfo {
   
-  public enum Status {TO_DO, ONGOING, DONE};
-  
-  private Status status;
+  public enum Status {TO_DO, ONGOING, DONE}
+
+    private Status status;
   private final Job job;
   private final List<Map<String, Object>> data;
   private List<Node> results;
@@ -29,7 +29,7 @@ public class JobInfo {
   public JobInfo(Job job) {
     this.job = job;
     status = Status.TO_DO;
-    data = Collections.synchronizedList(new ArrayList<Map<String, Object>>());
+    data = Collections.synchronizedList(new ArrayList<>());
   }
 
   public Status getStatus() {

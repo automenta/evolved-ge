@@ -9,7 +9,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.LoadingCache;
 import it.units.malelab.ege.core.Individual;
 import it.units.malelab.ege.core.Node;
-import static it.units.malelab.ege.core.evolver.StandardEvolver.CACHE_SIZE;
 import it.units.malelab.ege.core.fitness.Fitness;
 import it.units.malelab.ege.core.listener.EvolverListener;
 import it.units.malelab.ege.core.listener.event.EvolutionEndEvent;
@@ -18,10 +17,8 @@ import it.units.malelab.ege.core.listener.event.GenerationEvent;
 import it.units.malelab.ege.core.operator.GeneticOperator;
 import it.units.malelab.ege.util.Pair;
 import it.units.malelab.ege.util.Utils;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+
+import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -45,7 +42,7 @@ public class DeterministicCrowdingEvolver<G, T, F extends Fitness> extends Stand
     LoadingCache<Node<T>, F> fitnessCache = CacheBuilder.newBuilder().maximumSize(CACHE_SIZE).recordStats().build(getFitnessCacheLoader());
     //initialize population
     int births = 0;
-    List<Callable<List<Individual<G, T, F>>>> tasks = new ArrayList<>();
+    Collection<Callable<List<Individual<G, T, F>>>> tasks = new ArrayList<>();
     for (G genotype : configuration.getPopulationInitializer().build(configuration.getPopulationSize(), configuration.getInitGenotypeValidator(), random)) {
       tasks.add(individualFromGenotypeCallable(genotype, 0, mappingCache, fitnessCache, listeners, null, null, executor));
       births = births + 1;
@@ -67,7 +64,7 @@ public class DeterministicCrowdingEvolver<G, T, F extends Fitness> extends Stand
         parents.add(configuration.getParentSelector().select(rankedPopulation, random));
       }
       tasks.add(operatorApplicationCallable(operator, parents, random, currentGeneration, mappingCache, fitnessCache, listeners, executor));
-      List<Individual<G, T, F>> children = new ArrayList<>(Utils.getAll(executor.invokeAll(tasks)));
+      Collection<Individual<G, T, F>> children = new ArrayList<>(Utils.getAll(executor.invokeAll(tasks)));
       births = births + children.size();
       //replace
       for (Individual<G, T, F> child : children) {
@@ -105,7 +102,7 @@ public class DeterministicCrowdingEvolver<G, T, F extends Fitness> extends Stand
     List<List<Individual<G, T, F>>> rankedPopulation = configuration.getRanker().rank(population, random);
     Utils.broadcast(new EvolutionEndEvent<>((List) rankedPopulation, configuration.getNumberOfGenerations(), this, cacheStats(mappingCache, fitnessCache)), listeners, executor);
     for (Individual<G, T, F> individual : rankedPopulation.get(0)) {
-      bestPhenotypes.add(individual.getPhenotype());
+        bestPhenotypes.add(individual.phenotype);
     }
     return bestPhenotypes;
   }

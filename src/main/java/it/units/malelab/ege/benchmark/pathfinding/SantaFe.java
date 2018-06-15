@@ -1,6 +1,5 @@
 package it.units.malelab.ege.benchmark.pathfinding;
 
-import it.units.malelab.ege.benchmark.pathfinding.Trail;
 import it.units.malelab.ege.core.fitness.FitnessComputer;
 import it.units.malelab.ege.core.fitness.NumericFitness;
 import it.units.malelab.ege.core.Node;
@@ -12,20 +11,20 @@ import java.util.List;
  */
 public class SantaFe implements FitnessComputer<String, NumericFitness> {
 
-  static final String IF = "if(food_ahead()){";
-  static final String ELSE = "}else{";
-  static final String END_IF = "}";
-  static final String MOVE = "move();";
-  static final String LEFT = "left();";
-  static final String RIGHT = "right();";
+  private static final String IF = "if(food_ahead()){";
+  private static final String ELSE = "}else{";
+  private static final String END_IF = "}";
+  private static final String MOVE = "move();";
+  private static final String LEFT = "left();";
+  private static final String RIGHT = "right();";
 
   @Override
   public NumericFitness compute(Node<String> phenotypeRoot) {
-    List<Node<String>> phenotype = phenotypeRoot.leafNodes();
+    List<Node<String>> phenotype = phenotypeRoot.leafNodesList();
     Trail trail = new Trail(); //Trail to travese
     double fitness = trail.getFood(); //Initial fitness
     try {
-      if (phenotype.size() > 0) {
+      if (!phenotype.isEmpty()) {
         while (trail.get_Energy() > 0) {
           run(phenotype, trail, 0);
         }
@@ -34,7 +33,7 @@ public class SantaFe implements FitnessComputer<String, NumericFitness> {
         throw new IllegalArgumentException("Bad phenotype size");
       }
     } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
-      System.out.println("Error getting Fitness: " + phenotype.toString());
+      System.out.println("Error getting Fitness: " + phenotype);
     }
     return new NumericFitness(fitness);
   }
@@ -49,13 +48,13 @@ public class SantaFe implements FitnessComputer<String, NumericFitness> {
     return new NumericFitness(0);
   }
 
-  private void lookAheadElse(List<Node<String>> phenotype, int programCounter) {
+  private static void lookAheadElse(List<Node<String>> phenotype, int programCounter) {
     boolean found = false;
     int depth = 0;//Keep track of nested ifs
     //While program not finished and the else bloch for depth 0 is found
     while (phenotype.size() > programCounter && !found) {
       //Current token
-      final String token = phenotype.get(programCounter).getContent();
+      final String token = phenotype.get(programCounter).content;
       //Check else statment and correct depth
       if (token.equals(SantaFe.ELSE) && depth == 0) {
         found = true; //Found
@@ -77,13 +76,13 @@ public class SantaFe implements FitnessComputer<String, NumericFitness> {
   /**
    * Find the end if statement
    */
-  private void lookAheadEndIf(List<Node<String>> phenotype, int programCounter) {
+  private static void lookAheadEndIf(List<Node<String>> phenotype, int programCounter) {
     boolean found = false;
     int depth = 0;//Keep track of nested ifs
     //While program not finished and the else bloch for depth 0 is found
     while (phenotype.size() > programCounter && !found) {
       //Current token
-      final String token = phenotype.get(programCounter).getContent();
+      final String token = phenotype.get(programCounter).content;
       //Check else statment and correct depth
       if (token.equals(SantaFe.END_IF)) {
         if (depth == 0) {
@@ -104,11 +103,11 @@ public class SantaFe implements FitnessComputer<String, NumericFitness> {
   /**
    * Execute the program by calling the functions in Trail
    */
-  private void run(List<Node<String>> phenotype, Trail trail, int programCounter) {
+  private static void run(List<Node<String>> phenotype, Trail trail, int programCounter) {
     //Check if end of program
     if (programCounter < phenotype.size()) {
       //Get current token
-      final String token = phenotype.get(programCounter).getContent();
+      final String token = phenotype.get(programCounter).content;
       //Increase program counter
       programCounter++;
       if (token.equals(SantaFe.IF)) {//IF food ahead

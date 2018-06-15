@@ -9,7 +9,7 @@ package it.units.malelab.ege.benchmark.mapper;
  *
  * @author eric
  */
-public class GlobalCounter {
+class GlobalCounter {
   
   private int c = 0;
   

@@ -10,6 +10,7 @@ import it.units.malelab.ege.core.Node;
 import it.units.malelab.ege.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -36,16 +37,16 @@ public class FullTreeFactory<T> extends GrowTreeFactory<T> {
       return null;
     }
     Node<T> tree = new Node<>(symbol);
-    if (grammar.getRules().containsKey(symbol)) {
+      if (((Map<T, List<List<T>>>) grammar).containsKey(symbol)) {
       //a non-terminal
-      List<List<T>> options = grammar.getRules().get(symbol);
+          List<List<T>> options = ((Map<T, List<List<T>>>) grammar).get(symbol);
       List<List<T>> availableOptions = new ArrayList<>();
       //general idea: try the following
       //1. choose expansion with min,max including target depth
       //2. choose expansion
       for (List<T> option : options) {        
         Pair<Double, Double> minMax = optionMinMaxDepth(option);
-        if (((targetDepth-1)>=minMax.getFirst())&&((targetDepth-1)<=minMax.getSecond())) {
+        if (((targetDepth-1)>= minMax.first)&&((targetDepth-1)<= minMax.second)) {
           availableOptions.add(option);
         }
       }
@@ -58,7 +59,7 @@ public class FullTreeFactory<T> extends GrowTreeFactory<T> {
         if (child == null) {
           return null;
         }
-        tree.getChildren().add(child);
+          tree.children.add(child);
       }
     }
     return tree;

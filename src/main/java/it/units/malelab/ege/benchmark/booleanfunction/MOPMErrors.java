@@ -46,7 +46,7 @@ public class MOPMErrors implements FitnessComputer<String, NumericFitness> {
         //compute result
         boolean[] bitsResult = new boolean[2*size];
         for (int i = 0; i<2*size; i++) {
-          boolean[] bits = BooleanUtils.compute(BooleanUtils.transform(phenotype.getChildren().get(i)), vars, 1);
+          boolean[] bits = BooleanUtils.compute(BooleanUtils.transform(phenotype.children.get(i)), vars, 1);
           bitsResult[i] = bits[0];
         }
         //compare
@@ -56,7 +56,7 @@ public class MOPMErrors implements FitnessComputer<String, NumericFitness> {
         cases = cases+1;
       }
     }
-    return new NumericFitness((double)errors/(double)cases);
+    return new NumericFitness((double)errors/ cases);
   }
 
   @Override

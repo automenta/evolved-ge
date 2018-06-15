@@ -16,13 +16,13 @@ import java.io.IOException;
  *
  * @author eric
  */
-public class SantaFe extends Problem<String, NumericFitness> {
+class SantaFe extends Problem<String, NumericFitness> {
 
   public SantaFe(String target) throws IOException {
     super(Utils.parseFromFile(new File("grammars/santa-fe.bnf")),
             new it.units.malelab.ege.benchmark.pathfinding.SantaFe(),
             null,
-            new LeavesJoiner<String>()
+            new LeavesJoiner<>()
     );
   }
 

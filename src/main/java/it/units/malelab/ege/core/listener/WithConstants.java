@@ -11,8 +11,8 @@ import java.util.Map;
  *
  * @author eric
  */
-public interface WithConstants {
+interface WithConstants {
   
-  public void updateConstants(Map<String, Object> newConstants);
+  void updateConstants(Map<String, Object> newConstants);
   
 }

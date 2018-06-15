@@ -6,7 +6,6 @@
 package it.units.malelab.ege.util.distance;
 
 import it.units.malelab.ege.core.Sequence;
-import java.util.List;
 
 /**
  *
@@ -17,6 +16,9 @@ public class Edit<T> implements Distance<Sequence<T>> {
   //from https://en.wikibooks.org/wiki/Algorithm_Implementation/Strings/Levenshtein_distance#Java
   @Override
   public double d(Sequence<T> ts1, Sequence<T> ts2) {
+      if (ts1 == ts2)
+          return 0;
+
     int len0 = ts1.size()+ 1;
     int len1 = ts2.size()+ 1;
     int[] cost = new int[len0];

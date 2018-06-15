@@ -13,6 +13,7 @@ import it.units.malelab.ege.distributed.Job;
 import it.units.malelab.ege.distributed.master.MasterMessage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ import java.util.logging.Logger;
  *
  * @author eric
  */
-public class CommunicationRunnable implements Runnable {
+class CommunicationRunnable implements Runnable {
 
   private final Worker worker;
 
@@ -37,9 +38,9 @@ public class CommunicationRunnable implements Runnable {
 
   @Override
   public void run() {
-    try (Socket socket = new Socket(worker.getMasterAddress(), worker.getMasterPort());) {
+    try (Socket socket = new Socket(worker.getMasterAddress(), worker.getMasterPort())) {
       //handshake
-      ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+      ObjectOutput oos = new ObjectOutputStream(socket.getOutputStream());
       oos.flush();
       ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
       String challenge = DistributedUtils.decrypt((byte[]) ois.readObject(), worker.getKeyPhrase());

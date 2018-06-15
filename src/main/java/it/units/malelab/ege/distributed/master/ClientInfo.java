@@ -5,18 +5,15 @@
  */
 package it.units.malelab.ege.distributed.master;
 
-import it.units.malelab.ege.distributed.Job;
 import it.units.malelab.ege.distributed.worker.WorkerMessage;
-import java.util.Collections;
+
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  *
  * @author eric
  */
-public class ClientInfo {
+class ClientInfo {
   
   private WorkerMessage lastMessage;
   private Date lastContactDate;

@@ -32,7 +32,7 @@ public class BestPrinter<G, T, F extends Fitness> implements Collector<G, T, F>{
   public Map<String, Object> collect(GenerationEvent<G, T, F> event) {
     List<List<Individual<G, T, F>>> rankedPopulation = new ArrayList<>(event.getRankedPopulation());
     Individual<G, T, F> best = rankedPopulation.get(0).get(0);
-    return (Map)Collections.singletonMap("best.phenotype", phenotypePrinter.toString(best.getPhenotype()));
+      return (Map)Collections.singletonMap("best.phenotype", phenotypePrinter.toString(best.phenotype));
   }  
 
   @Override

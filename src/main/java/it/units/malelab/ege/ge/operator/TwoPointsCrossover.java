@@ -43,7 +43,7 @@ public class TwoPointsCrossover extends AbstractCrossover<BitsGenotype> {
             parent2, Range.closedOpen(startIndex2, endIndex2));
   }
 
-  protected List<BitsGenotype> children(BitsGenotype parent1, Range<Integer> range1, BitsGenotype parent2, Range<Integer> range2) {
+  static List<BitsGenotype> children(BitsGenotype parent1, Range<Integer> range1, BitsGenotype parent2, Range<Integer> range2) {
     int startIndex1 = range1.lowerEndpoint();
     int startIndex2 = range2.lowerEndpoint();
     int endIndex1 = range1.upperEndpoint();

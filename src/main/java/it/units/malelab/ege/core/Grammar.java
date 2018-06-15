@@ -14,35 +14,34 @@ import java.util.Map;
  *
  * @author eric
  */
-public class Grammar<T> implements Serializable {
+public class Grammar<T> extends LinkedHashMap<T,List<List<T>>> implements Serializable {
 
   public static final String RULE_ASSIGNMENT_STRING = "::=";
   public static final String RULE_OPTION_SEPARATOR_STRING = "|";
 
   private T startingSymbol;
-  private Map<T, List<List<T>>> rules;
 
   public Grammar() {
-    rules = new LinkedHashMap<>();
+    super();
   }
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder();
-    for (Map.Entry<T, List<List<T>>> rule : rules.entrySet()) {
+    StringBuilder sb = new StringBuilder(1024);
+    for (Map.Entry<T, List<List<T>>> rule : ((Map<T, List<List<T>>>) this).entrySet()) {
       sb.append(rule.getKey())
-              .append(" ")
+              .append(' ')
               .append(rule.getKey().equals(startingSymbol) ? "*" : "")
-              .append(RULE_ASSIGNMENT_STRING + " ");
+              .append(RULE_ASSIGNMENT_STRING + ' ');
       for (List<T> option : rule.getValue()) {
         for (T symbol : option) {
           sb.append(symbol)
-                  .append(" ");
+                  .append(' ');
         }
-        sb.append(RULE_OPTION_SEPARATOR_STRING + " ");
+        sb.append(RULE_OPTION_SEPARATOR_STRING + ' ');
       }
       sb.delete(sb.length() - 2 - RULE_OPTION_SEPARATOR_STRING.length(), sb.length());
-      sb.append("\n");
+      sb.append('\n');
     }
     return sb.toString();
   }
@@ -53,10 +52,6 @@ public class Grammar<T> implements Serializable {
 
   public void setStartingSymbol(T startingSymbol) {
     this.startingSymbol = startingSymbol;
-  }
-
-  public Map<T, List<List<T>>> getRules() {
-    return rules;
   }
 
 }

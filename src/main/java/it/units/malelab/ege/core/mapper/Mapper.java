@@ -15,6 +15,6 @@ import java.util.Map;
  */
 public interface Mapper<G, T> extends Serializable {
   
-  public Node<T> map(G genotype, Map<String, Object> report) throws MappingException;
+  Node<T> map(G genotype, Map<String, Object> report) throws MappingException;
   
 }

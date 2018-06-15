@@ -11,8 +11,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import it.units.malelab.ege.benchmark.KLandscapes;
 import it.units.malelab.ege.benchmark.symbolicregression.Nguyen7;
-import it.units.malelab.ege.core.Individual;
 import it.units.malelab.ege.core.Problem;
+import it.units.malelab.ege.core.evolver.Evolver;
 import it.units.malelab.ege.core.evolver.StandardConfiguration;
 import it.units.malelab.ege.core.evolver.StandardEvolver;
 import it.units.malelab.ege.core.fitness.NumericFitness;
@@ -50,14 +50,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -176,7 +169,7 @@ public class DUMapper {
       for (int t = 0; t < merged.length; t++) {
         for (int g = 0; g < merged[0].length; g++) {
           for (int i = 0; i < merged[0][0].length; i++) {
-            merged[t][g][i] = merged[t][g][i] + data[t][g][i] / (double) datas.length;
+            merged[t][g][i] = merged[t][g][i] + data[t][g][i] / datas.length;
           }
         }
       }
@@ -192,37 +185,41 @@ public class DUMapper {
 
   private static double[][][] buildGEData(String mapperName, int generations, int genotypeSize, Problem problem, long seed, int tournamentSize) throws InterruptedException, ExecutionException {
     Mapper<BitsGenotype, String> mapper;
-    if (mapperName.equals("whge")) {
-      mapper = new WeightedHierarchicalMapper<>(2, problem.getGrammar());
-    } else if (mapperName.equals("hge")) {
-      mapper = new HierarchicalMapper<>(problem.getGrammar());
-    } else {
-      mapper = new StandardGEMapper<>(8, 10, problem.getGrammar());
+    switch (mapperName) {
+      case "whge":
+        mapper = new WeightedHierarchicalMapper<>(2, problem.getGrammar());
+        break;
+      case "hge":
+        mapper = new HierarchicalMapper<>(problem.getGrammar());
+        break;
+      default:
+        mapper = new StandardGEMapper<>(8, 10, problem.getGrammar());
+        break;
     }
     StandardConfiguration<BitsGenotype, String, NumericFitness> configuration = new StandardConfiguration<>(
             500,
             generations,
             new RandomInitializer<>(new BitsGenotypeFactory(genotypeSize)),
-            new Any<BitsGenotype>(),
+            new Any<>(),
             mapper,
             new Utils.MapBuilder<GeneticOperator<BitsGenotype>, Double>()
             .put(new LengthPreservingTwoPointsCrossover(), 0.8d)
             .put(new ProbabilisticMutation(0.01), 0.2d).build(),
-            new ComparableRanker<>(new IndividualComparator<BitsGenotype, String, NumericFitness>(IndividualComparator.Attribute.FITNESS)),
-            new Tournament<Individual<BitsGenotype, String, NumericFitness>>(tournamentSize),
-            new LastWorst<Individual<BitsGenotype, String, NumericFitness>>(),
+            new ComparableRanker<>(new IndividualComparator<>(IndividualComparator.Attribute.FITNESS)),
+            new Tournament<>(tournamentSize),
+            new LastWorst<>(),
             500,
             true,
             problem,
             false,
             -1, -1
     );
-    StandardEvolver evolver = new StandardEvolver(configuration, false);
+    Evolver evolver = new StandardEvolver(configuration, false);
     List<EvolverListener> listeners = new ArrayList<>();
-    final EvolutionImageSaverListener evolutionImageSaverListener = new EvolutionImageSaverListener(Collections.EMPTY_MAP, null, EvolutionImageSaverListener.ImageType.DU);
+    final EvolutionImageSaverListener evolutionImageSaverListener = new EvolutionImageSaverListener(Collections.emptyMap(), null, EvolutionImageSaverListener.ImageType.DU);
     listeners.add(evolutionImageSaverListener);
     listeners.add(new CollectorGenerationLogger<>(
-            Collections.EMPTY_MAP, System.out, true, 10, " ", " | ",
+            Collections.emptyMap(), System.out, true, 10, " ", " | ",
             new Population(),
             new NumericFirstBest(false, problem.getTestingFitnessComputer(), "%6.2f"),
             new Diversity(),
@@ -239,26 +236,26 @@ public class DUMapper {
             500,
             generations,
             new RandomInitializer<>(new SGEGenotypeFactory<>(m)),
-            new Any<SGEGenotype<String>>(),
+            new Any<>(),
             m,
             new Utils.MapBuilder<GeneticOperator<SGEGenotype<String>>, Double>()
-            .put(new SGECrossover<String>(), 0.8d)
+            .put(new SGECrossover<>(), 0.8d)
             .put(new SGEMutation<>(0.01d, m), 0.2d).build(),
-            new ComparableRanker<>(new IndividualComparator<SGEGenotype<String>, String, NumericFitness>(IndividualComparator.Attribute.FITNESS)),
-            new Tournament<Individual<SGEGenotype<String>, String, NumericFitness>>(3),
-            new LastWorst<Individual<SGEGenotype<String>, String, NumericFitness>>(),
+            new ComparableRanker<>(new IndividualComparator<>(IndividualComparator.Attribute.FITNESS)),
+            new Tournament<>(3),
+            new LastWorst<>(),
             500,
             true,
             problem,
             false,
             -1, -1
     );
-    StandardEvolver evolver = new StandardEvolver(configuration, false);
+    Evolver evolver = new StandardEvolver(configuration, false);
     List<EvolverListener> listeners = new ArrayList<>();
-    final EvolutionImageSaverListener evolutionImageSaverListener = new EvolutionImageSaverListener(Collections.EMPTY_MAP, null, EvolutionImageSaverListener.ImageType.DU);
+    final EvolutionImageSaverListener evolutionImageSaverListener = new EvolutionImageSaverListener(Collections.emptyMap(), null, EvolutionImageSaverListener.ImageType.DU);
     listeners.add(evolutionImageSaverListener);
     listeners.add(new CollectorGenerationLogger<>(
-            Collections.EMPTY_MAP, System.out, true, 10, " ", " | ",
+            Collections.emptyMap(), System.out, true, 10, " ", " | ",
             new Population(),
             new NumericFirstBest(false, problem.getTestingFitnessComputer(), "%6.2f"),
             new Diversity(),
@@ -372,15 +369,15 @@ public class DUMapper {
           double used = 0;
           if (currentPopulation.get(p).containsKey(i)) {
             Pair<Double, Double> pair = currentPopulation.get(p).get(i);
-            value = pair.getSecond();
-            used = pair.getFirst();
+            value = pair.second;
+            used = pair.first;
           }
           values[i][p] = value;
           localUsages[i] = localUsages[i] + used;
         }
       }
       for (int i = 0; i < maxInnovationNumber; i++) {
-        usages[g][i] = localUsages[i] / (double) currentPopulation.size();
+        usages[g][i] = localUsages[i] / currentPopulation.size();
         diversities[g][i] = normalizedVar(values[i]);
       }
     }
@@ -396,7 +393,7 @@ public class DUMapper {
       String line;
       boolean isInPopulation = false;
       Map<Integer, Pair<Double, Double>> currentIndividual = null;
-      Set<Integer> currentIndividualConnectedNodes = new HashSet<>();
+      Collection<Integer> currentIndividualConnectedNodes = new HashSet<>();
       while ((line = reader.readLine()) != null) {
         if (line.equals("[NEAT-POPULATION:SPECIES]")) {
           isInPopulation = true;
@@ -457,15 +454,15 @@ public class DUMapper {
           double used = 0;
           if (currentPopulation.get(p).containsKey(i)) {
             Pair<Double, Double> pair = currentPopulation.get(p).get(i);
-            value = pair.getSecond();
-            used = pair.getFirst();
+            value = pair.second;
+            used = pair.first;
           }
           values[i][p] = value;
           localUsages[i] = localUsages[i] + used;
         }
       }
       for (int i = 0; i < maxInnovationNumber; i++) {
-        usages[g][i] = localUsages[i] / (double) currentPopulation.size();
+        usages[g][i] = localUsages[i] / currentPopulation.size();
         diversities[g][i] = normalizedVar(values[i]);
       }
     }
@@ -519,12 +516,12 @@ public class DUMapper {
     }
     //build node innovation numbers
     String[] nodeTypes = new String[]{"i", "b", "h", "o"};
-    List<Integer> nodeINs = new ArrayList<>();
+    Collection<Integer> nodeINs = new ArrayList<>();
     for (String nodeType : nodeTypes) {
       List<Integer> typeNodeINs = new ArrayList<>();
-      for (Integer in : nodeTypesMap.keySet()) {
-        if (nodeTypesMap.get(in).equals(nodeType)) {
-          typeNodeINs.add(in);
+      for (Map.Entry<Integer, String> integerStringEntry: nodeTypesMap.entrySet()) {
+        if (integerStringEntry.getValue().equals(nodeType)) {
+          typeNodeINs.add(integerStringEntry.getKey());
         }
       }
       Collections.sort(typeNodeINs);
@@ -545,39 +542,49 @@ public class DUMapper {
         Multiset<Set<Integer>> tos = HashMultiset.create();
         int c = 0;
         for (Map<Integer, Multimap<Integer, Integer>> currentIndividual : currentPopulation) {
-          if (nodeTypesMap.get(nodeIN).equals("i") || nodeTypesMap.get(nodeIN).equals("b")) {
-            if (currentIndividual.containsKey(nodeIN)) {
-              localUsages[c] = currentIndividual.get(nodeIN).get(1).isEmpty() ? 0 : 1;
-              tos.add(new HashSet<>(currentIndividual.get(nodeIN).get(1)));
-            } else {
-              tos.add(Collections.EMPTY_SET);
-            }
-          } else if (nodeTypesMap.get(nodeIN).equals("h")) {
-            if (currentIndividual.containsKey(nodeIN)) {
-              localUsages[c] = (currentIndividual.get(nodeIN).get(-1).isEmpty() ? 0 : 0.5) + (currentIndividual.get(nodeIN).get(1).isEmpty() ? 0 : 0.5);
-              tos.add(new HashSet<>(currentIndividual.get(nodeIN).get(1)));
-              froms.add(new HashSet<>(currentIndividual.get(nodeIN).get(-1)));
-            } else {
-              tos.add(Collections.EMPTY_SET);
-              froms.add(Collections.EMPTY_SET);
-            }
-          } else if (nodeTypesMap.get(nodeIN).equals("o")) {
-            if (currentIndividual.containsKey(nodeIN)) {
-              localUsages[c] = currentIndividual.get(nodeIN).get(-1).isEmpty() ? 0 : 1;
-              froms.add(new HashSet<>(currentIndividual.get(nodeIN).get(-1)));
-            } else {
-              froms.add(Collections.EMPTY_SET);
-            }
+          switch (nodeTypesMap.get(nodeIN)) {
+            case "i":
+            case "b":
+              if (currentIndividual.containsKey(nodeIN)) {
+                localUsages[c] = currentIndividual.get(nodeIN).get(1).isEmpty() ? 0 : 1;
+                tos.add(new HashSet<>(currentIndividual.get(nodeIN).get(1)));
+              } else {
+                tos.add(Collections.emptySet());
+              }
+              break;
+            case "h":
+              if (currentIndividual.containsKey(nodeIN)) {
+                localUsages[c] = (currentIndividual.get(nodeIN).get(-1).isEmpty() ? 0 : 0.5) + (currentIndividual.get(nodeIN).get(1).isEmpty() ? 0 : 0.5);
+                tos.add(new HashSet<>(currentIndividual.get(nodeIN).get(1)));
+                froms.add(new HashSet<>(currentIndividual.get(nodeIN).get(-1)));
+              } else {
+                tos.add(Collections.emptySet());
+                froms.add(Collections.emptySet());
+              }
+              break;
+            case "o":
+              if (currentIndividual.containsKey(nodeIN)) {
+                localUsages[c] = currentIndividual.get(nodeIN).get(-1).isEmpty() ? 0 : 1;
+                froms.add(new HashSet<>(currentIndividual.get(nodeIN).get(-1)));
+              } else {
+                froms.add(Collections.emptySet());
+              }
+              break;
           }
           c = c + 1;
         }
         usages[g][i] = StatUtils.mean(localUsages);
-        if (nodeTypesMap.get(nodeIN).equals("i") || nodeTypesMap.get(nodeIN).equals("b")) {
-          diversities[g][i] = Utils.multisetDiversity(tos, tos.elementSet());
-        } else if (nodeTypesMap.get(nodeIN).equals("h")) {
-          diversities[g][i] = Utils.multisetDiversity(tos, tos.elementSet()) / 2 + Utils.multisetDiversity(froms, tos.elementSet()) / 2;
-        } else if (nodeTypesMap.get(nodeIN).equals("o")) {
-          diversities[g][i] = Utils.multisetDiversity(froms, tos.elementSet());
+        switch (nodeTypesMap.get(nodeIN)) {
+          case "i":
+          case "b":
+            diversities[g][i] = Utils.multisetDiversity(tos, tos.elementSet());
+            break;
+          case "h":
+            diversities[g][i] = Utils.multisetDiversity(tos, tos.elementSet()) / 2 + Utils.multisetDiversity(froms, tos.elementSet()) / 2;
+            break;
+          case "o":
+            diversities[g][i] = Utils.multisetDiversity(froms, tos.elementSet());
+            break;
         }
         i = i + 1;
       }
@@ -683,13 +690,13 @@ public class DUMapper {
       for (int y = 0; y < inImage.getHeight(); y++) {
         Color inColor = new Color(inImage.getRGB(x, y));
         Color outColor = new Color(
-                Math.min((float) Math.floor((float) inColor.getRed() / 255f * bins) / (bins - 1), 1f),
-                Math.min((float) Math.floor((float) inColor.getGreen() / 255f * bins) / (bins - 1), 1f),
+                Math.min((float) Math.floor(inColor.getRed() / 255f * bins) / (bins - 1), 1f),
+                Math.min((float) Math.floor(inColor.getGreen() / 255f * bins) / (bins - 1), 1f),
                 0
         );
         outRGDImage.setRGB(x, y, outColor.getRGB());
-        int cmRIndex = (int) Math.min((int) Math.floor((float) inColor.getRed() / 255f * 3), 2);
-        int cmGIndex = (int) Math.min((int) Math.floor((float) inColor.getGreen() / 255f * 3), 2);
+        int cmRIndex = Math.min((int) Math.floor(inColor.getRed() / 255f * 3), 2);
+        int cmGIndex = Math.min((int) Math.floor(inColor.getGreen() / 255f * 3), 2);
         outColor = colorMap[cmRIndex][cmGIndex];
         outCMImage.setRGB(x, y, outColor.getRGB());
       }

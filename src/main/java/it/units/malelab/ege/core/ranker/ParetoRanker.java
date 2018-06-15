@@ -40,7 +40,7 @@ public class ParetoRanker<G, T, F extends MultiObjectiveFitness> implements Rank
     int[] counts = new int[individuals.size()];
     for (int i = 0; i<individuals.size(); i++) {
       for (int j = i+1; j<individuals.size(); j++) {
-        int outcome = compare(individuals.get(i).getFitness(), individuals.get(j).getFitness());
+          int outcome = compare(individuals.get(i).fitness, individuals.get(j).fitness);
         if (outcome<0) {
           counts[j] = counts[j]+1;
         } else if (outcome>0) {
@@ -53,6 +53,8 @@ public class ParetoRanker<G, T, F extends MultiObjectiveFitness> implements Rank
   
   @Override
   public int compare(MultiObjectiveFitness f1, MultiObjectiveFitness f2) {
+    if (f1==f2)
+      return 0;
     int better = 0;
     int worse = 0;
     for (int i = 0; i<f1.getValue().length; i++) {

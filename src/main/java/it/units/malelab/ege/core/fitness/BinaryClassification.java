@@ -14,8 +14,8 @@ import java.util.List;
  */
 public class BinaryClassification<I, T> implements FitnessComputer<T, MultiObjectiveFitness<Double>> {
 
-  public static interface Classifier<I, T> {
-    public boolean classify(I instance, Node<T> classifier);
+  public interface Classifier<I, T> {
+    boolean classify(I instance, Node<T> classifier);
   }
   
   private final List<I> positives;
@@ -30,8 +30,8 @@ public class BinaryClassification<I, T> implements FitnessComputer<T, MultiObjec
   
   public BinaryClassification<I, T> subset(double from, double to) {
     return new BinaryClassification<>(
-            positives.subList((int)Math.round((double)positives.size()*from), (int)Math.round((double)positives.size()*to)),
-            negatives.subList((int)Math.round((double)negatives.size()*from), (int)Math.round((double)negatives.size()*to)),
+            positives.subList((int)Math.round(positives.size() *from), (int)Math.round(positives.size() *to)),
+            negatives.subList((int)Math.round(negatives.size() *from), (int)Math.round(negatives.size() *to)),
             classifier);
   }
   
@@ -45,9 +45,9 @@ public class BinaryClassification<I, T> implements FitnessComputer<T, MultiObjec
     for (I negative : negatives) {
       falsePositives = falsePositives+(classifier.classify(negative, phenotype)?1:0);
     }
-    return new MultiObjectiveFitness<Double>(
-            falsePositives/(double)negatives.size(),
-            falseNegatives/(double)positives.size());
+    return new MultiObjectiveFitness<>(
+            falsePositives / negatives.size(),
+            falseNegatives / positives.size());
   }
 
   @Override

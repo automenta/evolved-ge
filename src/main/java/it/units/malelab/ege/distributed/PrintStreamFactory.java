@@ -28,19 +28,19 @@ public class PrintStreamFactory {
 
   public PrintStreamFactory(String baseDirName) {
     this.baseDirName = baseDirName;
-    streams = Collections.synchronizedMap(new HashMap<List<String>, PrintStream>());
+    streams = Collections.synchronizedMap(new HashMap<>());
   }
   
   
   public PrintStream get(List<String> keys, String fileName) {
     PrintStream ps = streams.get(keys);
     if (ps==null) {
-      String initials = "";
+      StringBuilder initials = new StringBuilder();
       for (String key : keys) {
-        initials = initials+key.substring(0, 1);
+        initials.append(key.substring(0, 1));
       }
       String currentDate = String.format("%1$td%1$tm%1$tH%1$tM%1$tS", Calendar.getInstance().getTime().getTime());
-      fileName = fileName+"."+initials+"."+currentDate+".txt";
+      fileName = fileName+ '.' +initials+ '.' +currentDate+".txt";
       fileName = fileName.replaceAll("[^a-zA-Z0-9._]", "");
       fileName = baseDirName+File.separator+fileName;
       try {

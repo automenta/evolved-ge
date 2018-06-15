@@ -56,7 +56,7 @@ public class FullTreeFactoryTest {
       FullTreeFactory<String> f = new FullTreeFactory<>(maxDepth, g);
       for (int i = 0; i < 100; i++) {
         Node<String> tree = f.build(random);
-        assertEquals("tree root should be the starting symbol", g.getStartingSymbol(), tree.getContent());
+          assertEquals("tree root should be the starting symbol", g.getStartingSymbol(), tree.content);
         assertTrue("tree depth should be <=" + maxDepth, tree.depth() <= maxDepth);
       }
     }

@@ -28,7 +28,7 @@ public enum Operator implements Element {
   
   private final String string;
 
-  private Operator(String string) {
+  Operator(String string) {
     this.string = string;
   }
 

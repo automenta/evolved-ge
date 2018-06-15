@@ -11,44 +11,45 @@ import java.util.Objects;
  *
  * @author eric
  */
-public class Triplet<F, S, T> extends Pair<F, S> {
+public class Triplet<F, S, T>  {
 
-  private final T third;
+  public final F first;
+  public final S second;
+  public final T third;
+  private final int hash;
 
   public Triplet(F first, S second, T third) {
-    super(first, second);
+    this.first = first;
+    this.second = second;
     this.third = third;
-  }
-
-  public T getThird() {
-    return third;
+    int hash = 5;
+    hash = 83 * hash + Objects.hashCode(this.first);
+    hash = 83 * hash + Objects.hashCode(this.second);
+    hash = 67 * hash + Objects.hashCode(this.third);
+    this.hash = hash;
   }
 
   @Override
   public int hashCode() {
-    int hash = 7;
-    hash = 67 * hash + Objects.hashCode(this.third);
-    return hash;
+   return hash;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    final Triplet<?, ?, ?> other = (Triplet<?, ?, ?>) obj;
-    if (!Objects.equals(this.third, other.third)) {
-      return false;
-    }
-    return super.equals(obj);
+    if (this == obj) return true;
+    if (!(obj instanceof Triplet)) return false;
+
+    final Triplet other = (Triplet) obj;
+    if (hash!=other.hash) return false;
+
+    return Objects.equals(this.first, other.first) && Objects.equals(this.second, other.second)
+            && Objects.equals(this.third, other.third)
+            ;
   }
 
   @Override
   public String toString() {
-    return "<" + getFirst() + ", " + getSecond() + ", " + third + '>';
+    return "<" + first + ", " + second + ", " + third + '>';
   }
 
 }

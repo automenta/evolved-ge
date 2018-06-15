@@ -21,7 +21,7 @@ public class NumericFitness implements Comparable<NumericFitness>, Fitness<Doubl
 
   @Override
   public int compareTo(NumericFitness otherFitness) {
-    return Double.compare(value, ((NumericFitness)otherFitness).getValue());
+    return Double.compare(value, otherFitness.getValue());
   }
 
   @Override
@@ -50,19 +50,11 @@ public class NumericFitness implements Comparable<NumericFitness>, Fitness<Doubl
       return false;
     }
     final NumericFitness other = (NumericFitness) obj;
-    if (Double.doubleToLongBits(this.value) != Double.doubleToLongBits(other.value)) {
-      return false;
-    }
-    return true;
+      return Double.doubleToLongBits(this.value) == Double.doubleToLongBits(other.value);
   }
   
   public static Comparator<NumericFitness> comparator() {
-    return new Comparator<NumericFitness>() {
-      @Override
-      public int compare(NumericFitness f1, NumericFitness f2) {
-        return f1.compareTo(f2);
-      }      
-    };
+    return NumericFitness::compareTo;
   }
   
 }

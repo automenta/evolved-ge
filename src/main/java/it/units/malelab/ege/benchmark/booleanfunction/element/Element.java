@@ -11,6 +11,6 @@ package it.units.malelab.ege.benchmark.booleanfunction.element;
  */
 public interface Element {
   
-  public String toString();
+  String toString();
   
 }

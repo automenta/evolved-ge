@@ -14,6 +14,6 @@ import java.util.Random;
  */
 public interface Factory<G> extends Serializable {
   
-  public G build(Random random);
+  G build(Random random);
   
 }

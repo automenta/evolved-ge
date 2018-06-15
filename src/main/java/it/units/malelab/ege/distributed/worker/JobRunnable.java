@@ -70,7 +70,7 @@ public class JobRunnable implements Runnable {
       public void listen(EvolutionEvent event) {
         //compute data
         Map<String, Object> data = new LinkedHashMap<>();
-        int generation = ((GenerationEvent) event).getGeneration();
+        int generation = event.getGeneration();
         data.put(Master.CLIENT_NAME, worker.getName());
         data.put(Master.JOB_ID_NAME, job.getId());
         data.put(Master.GENERATION_NAME, generation);
@@ -86,7 +86,7 @@ public class JobRunnable implements Runnable {
       }
     });
     listeners.add(new CollectorGenerationLogger(
-            Collections.EMPTY_MAP, System.out, true, 10, " ", " | ", (Collector[]) job.getCollectors().toArray()
+            Collections.emptyMap(), System.out, true, 10, " ", " | ", (Collector[]) job.getCollectors().toArray()
     ));
     try {
       List<Node> finalBestRank = evolver.solve(worker.getTaskExecutor(), random, listeners);

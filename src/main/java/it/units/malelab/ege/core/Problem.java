@@ -8,7 +8,6 @@ package it.units.malelab.ege.core;
 import it.units.malelab.ege.core.fitness.Fitness;
 import it.units.malelab.ege.core.fitness.FitnessComputer;
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  *

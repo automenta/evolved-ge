@@ -16,7 +16,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
@@ -24,20 +23,19 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.logging.Logger;
 
 /**
  *
  * @author eric
  */
-public class MapperGenerationValidatorDistributedExperimenter extends MapperGenerationDistributedExperimenter {
+public final class MapperGenerationValidatorDistributedExperimenter extends MapperGenerationDistributedExperimenter {
 
   private final static Logger L = Logger.getLogger(MapperGenerationValidatorDistributedExperimenter.class.getName());
 
   private final String mappersFileName;
 
-  public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
+  public static void main(String[] args) throws IOException {
 
     args = new String[]{"hi", "9001", "/home/eric/experiments/ge/dist", "map.gen.validation", "/home/eric/experiments/ge/dist/mappers.big.txt"};
     String keyPhrase = args[0];
@@ -49,49 +47,49 @@ public class MapperGenerationValidatorDistributedExperimenter extends MapperGene
     experimenter.start();
   }
 
-  public MapperGenerationValidatorDistributedExperimenter(String mappersFileName, String keyPhrase, int port, String baseResultDirName, String baseResultFileName) throws IOException {
+  private MapperGenerationValidatorDistributedExperimenter(String mappersFileName, String keyPhrase, int port, String baseResultDirName, String baseResultFileName) throws IOException {
     super(keyPhrase, port, baseResultDirName, baseResultFileName);
     this.mappersFileName = mappersFileName;
   }
 
   private static String ps(Node<String> t, int d) {
-    String s = "";
+    StringBuilder s = new StringBuilder();
     for (int i = 0; i < d; i++) {
-      s = s + "\t";
+      s.append('\t');
     }
-    s = s + "[. {\\gft{";
-    if (t.getContent().startsWith("<")) {
-      s = s + "\\bnfPiece{" + t.getContent().replaceAll("_", ".").substring(1, t.getContent().length() - 1) + "}";
+    s.append("[. {\\gft{");
+    if (t.content.startsWith("<")) {
+      s.append("\\bnfPiece{").append(t.content.replaceAll("_", ".").substring(1, t.content.length() - 1)).append('}');
     } else {
-      s = s + t.getContent().replaceAll("_", ".");
+      s.append(t.content.replaceAll("_", "."));
     }
-    s = s + "}}";
-    for (Node<String> child : t.getChildren()) {
-      s = s + "\n" + ps(child, d + 1);
+    s.append("}}");
+      for (Node<String> child : t.children) {
+      s.append('\n').append(ps(child, d + 1));
     }
-    s = s + " ]";
-    return s;
+    s.append(" ]");
+    return s.toString();
   }
 
   private static String pe(Node<Element> t, int d) {
-    String s = "";
+    StringBuilder s = new StringBuilder();
     for (int i = 0; i < d; i++) {
-      s = s + "\t";
+      s.append('\t');
     }
-    s = s + "[. {\\gft{"+t.getContent().toString().toLowerCase().replaceAll("_", ".")+"}}";
-    for (Node<Element> child : t.getChildren()) {
-      s = s + "\n" + pe(child, d + 1);
+    s.append("[. {\\gft{").append(t.content.toString().toLowerCase().replaceAll("_", ".")).append("}}");
+      for (Node<Element> child : t.children) {
+      s.append('\n').append(pe(child, d + 1));
     }
-    s = s + " ]";
-    return s;
+    s.append(" ]");
+    return s.toString();
   }
 
   @Override
   public void start() throws IOException {
 
     //System.out.println(ps(getGERawTree(), 0));
-    System.out.println(pe(MapperUtils.transform(getWHGERawTree().getChildren().get(0)), 0));
-    System.out.println(pe(MapperUtils.transform(getWHGERawTree().getChildren().get(1)), 0));
+      System.out.println(pe(MapperUtils.transform(getWHGERawTree().children.get(0)), 0));
+      System.out.println(pe(MapperUtils.transform(getWHGERawTree().children.get(1)), 0));
     System.exit(0);
 
     //baseline jobs
@@ -130,8 +128,8 @@ public class MapperGenerationValidatorDistributedExperimenter extends MapperGene
           Node<String> mapper = deserializeBase64(selectedSerializedMapper);
           submitValidationJobs(mapper, previousMapperName, Integer.parseInt(previousOuterRun), innerCount);
           //print summary
-          mappersPropsPs.print(data.get("mapper.name") + ";");
-          mappersPropsPs.print(data.get("outer.run") + ";");
+          mappersPropsPs.print(data.get("mapper.name") + ';');
+          mappersPropsPs.print(data.get("outer.run") + ';');
           mappersPropsPs.print(innerCount + ";");
           mappersPropsPs.print(currentMap.get(selectedSerializedMapper).getValue()[0] + ";");
           mappersPropsPs.print(currentMap.get(selectedSerializedMapper).getValue()[1] + ";");
@@ -155,7 +153,7 @@ public class MapperGenerationValidatorDistributedExperimenter extends MapperGene
           break;
         }
       }
-      currentMap.put(data.get("mapper.serialized.base64"), new MultiObjectiveFitness<Double>(
+      currentMap.put(data.get("mapper.serialized.base64"), new MultiObjectiveFitness<>(
               Double.parseDouble(data.get("redundancy")),
               Double.parseDouble(data.get("non.locality")),
               Double.parseDouble(data.get("non.uniformity"))
@@ -174,7 +172,7 @@ public class MapperGenerationValidatorDistributedExperimenter extends MapperGene
     }
   }
 
-  private Node<String> deserializeBase64(String s) {
+  private static Node<String> deserializeBase64(String s) {
     ObjectInputStream ois = null;
     Node<String> tree = null;
     try {
@@ -182,9 +180,7 @@ public class MapperGenerationValidatorDistributedExperimenter extends MapperGene
       ByteArrayInputStream bais = new ByteArrayInputStream(buffer);
       ois = new ObjectInputStream(bais);
       tree = (Node<String>) ois.readObject();
-    } catch (IOException ex) {
-      //ignore
-    } catch (ClassNotFoundException ex) {
+    } catch (IOException | ClassNotFoundException ex) {
       //ignore
     } finally {
       if (ois != null) {

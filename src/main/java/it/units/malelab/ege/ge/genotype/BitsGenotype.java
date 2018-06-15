@@ -9,13 +9,8 @@ import com.google.common.collect.Range;
 import it.units.malelab.ege.core.ConstrainedSequence;
 import it.units.malelab.ege.core.Sequence;
 import it.units.malelab.ege.util.Utils;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+
+import java.util.*;
 
 /**
  *
@@ -35,7 +30,7 @@ public class BitsGenotype implements ConstrainedSequence<Boolean> {
     DOMAIN = Collections.unmodifiableSet(domain);
   }
 
-  public BitsGenotype(String bits) {
+  public BitsGenotype(CharSequence bits) {
     this(bits.length());
     for (int i = 0; i < length; i++) {
       bitSet.set(i, bits.charAt(i) != '0');
@@ -87,7 +82,7 @@ public class BitsGenotype implements ConstrainedSequence<Boolean> {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append(length + ":");
+    sb.append(length).append(':');
     for (int i = 0; i < length; i++) {
       if (i > 0 && i % 8 == 0) {
         sb.append('-');
@@ -144,7 +139,7 @@ public class BitsGenotype implements ConstrainedSequence<Boolean> {
     return compressed;
   }
 
-  public List<BitsGenotype> slices(final List<Range<Integer>> ranges) {
+  public List<BitsGenotype> slices(final Collection<Range<Integer>> ranges) {
     List<BitsGenotype> genotypes = new ArrayList<>(ranges.size());
     for (Range<Integer> range : ranges) {
       genotypes.add(slice(range));
@@ -188,10 +183,7 @@ public class BitsGenotype implements ConstrainedSequence<Boolean> {
     if (this.length != other.length) {
       return false;
     }
-    if (!Objects.equals(this.bitSet, other.bitSet)) {
-      return false;
-    }
-    return true;
+    return Objects.equals(this.bitSet, other.bitSet);
   }
 
   @Override

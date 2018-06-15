@@ -6,11 +6,8 @@
 package it.units.malelab.ege.core;
 
 import it.units.malelab.ege.core.fitness.Fitness;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+
+import java.util.*;
 
 /**
  *
@@ -18,14 +15,14 @@ import java.util.Objects;
  */
 public class Individual<G, T, F extends Fitness> {
 
-  private final G genotype;
-  private final Node<T> phenotype;
-  private final F fitness;
-  private final int birthDate;
-  private final List<Individual<G, T, F>> parents;
-  private final Map<String, Object> otherInfo;
+  public final G genotype;
+  public final Node<T> phenotype;
+  public final F fitness;
+  public final int birthDate;
+  public final List<Individual<G, T, F>> parents;
+  public final Map<String, Object> otherInfo;
 
-  public Individual(G genotype, Node<T> phenotype, F fitness, int birthDate, List<Individual<G, T, F>> parents, Map<String, Object> otherInfo) {
+  public Individual(G genotype, Node<T> phenotype, F fitness, int birthDate, Collection<Individual<G, T, F>> parents, Map<String, Object> otherInfo) {
     this.genotype = genotype;
     this.phenotype = phenotype;
     this.fitness = fitness;
@@ -40,30 +37,6 @@ public class Individual<G, T, F extends Fitness> {
     }
   }
 
-  public G getGenotype() {
-    return genotype;
-  }
-
-  public Node<T> getPhenotype() {
-    return phenotype;
-  }
-
-  public F getFitness() {
-    return fitness;
-  }
-
-  public int getBirthDate() {
-    return birthDate;
-  }
-
-  public List<Individual<G, T, F>> getParents() {
-    return parents;
-  }
-
-  public Map<String, Object> getOtherInfo() {
-    return otherInfo;
-  }
-
   @Override
   public String toString() {
     return "Individual{" + "genotype=" + genotype + ", phenotype=" + phenotype + ", fitness=" + fitness + '}';
@@ -71,9 +44,10 @@ public class Individual<G, T, F extends Fitness> {
 
   @Override
   public int hashCode() {
-    int hash = 5;
-    hash = 59 * hash + Objects.hashCode(this.genotype);
-    return hash;
+//    int hash = 5;
+//    hash = 59 * hash + Objects.hashCode(this.genotype);
+//    return hash;
+    return genotype.hashCode();
   }
 
   @Override
@@ -88,10 +62,7 @@ public class Individual<G, T, F extends Fitness> {
       return false;
     }
     final Individual<?, ?, ?> other = (Individual<?, ?, ?>) obj;
-    if (!Objects.equals(this.genotype, other.genotype)) {
-      return false;
-    }
-    return true;
+      return Objects.equals(this.genotype, other.genotype);
   }   
 
 }

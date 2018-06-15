@@ -14,7 +14,6 @@ import java.security.Key;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class DistributedUtils {
     return new String(cipher(bytes, keyString, Cipher.DECRYPT_MODE));
   }
 
-  public static byte[] cipher(byte[] bytes, String keyString, int mode) {
+  private static byte[] cipher(byte[] bytes, String keyString, int mode) {
     try {
       Cipher c = Cipher.getInstance("AES");
       byte[] keyBytes = new byte[16];
@@ -55,17 +54,11 @@ public class DistributedUtils {
       Key key = new SecretKeySpec(keyBytes, "AES");
       c.init(mode, key);
       return c.doFinal(bytes);
-    } catch (NoSuchAlgorithmException ex) {
+    } catch (NoSuchAlgorithmException | BadPaddingException | IllegalBlockSizeException | InvalidKeyException ex) {
       L.log(Level.SEVERE, String.format("Cannot encrypt: %s", ex), ex);
     } catch (NoSuchPaddingException ex) {
       L.log(Level.SEVERE, String.format("Cannot encrypt: %s", ex), ex);
       //} catch (IOException ex) {
-      L.log(Level.SEVERE, String.format("Cannot encrypt: %s", ex), ex);
-    } catch (InvalidKeyException ex) {
-      L.log(Level.SEVERE, String.format("Cannot encrypt: %s", ex), ex);
-    } catch (IllegalBlockSizeException ex) {
-      L.log(Level.SEVERE, String.format("Cannot encrypt: %s", ex), ex);
-    } catch (BadPaddingException ex) {
       L.log(Level.SEVERE, String.format("Cannot encrypt: %s", ex), ex);
     }
     return bytes;
@@ -79,8 +72,7 @@ public class DistributedUtils {
   }
 
   public static List<String> jobKeys(Job job) {
-    List<String> keys = new ArrayList<>();
-    keys.addAll(job.getKeys().keySet());
+      List<String> keys = new ArrayList<>(job.getKeys().keySet());
     keys.add(Master.CLIENT_NAME);
     keys.add(Master.JOB_ID_NAME);
     keys.add(Master.GENERATION_NAME);
@@ -93,12 +85,12 @@ public class DistributedUtils {
 
   public static void writeHeader(PrintStream ps, List<String> keys) {
     for (int i = 0; i < keys.size() - 1; i++) {
-      ps.print(keys.get(i) + ";");
+      ps.print(keys.get(i) + ';');
     }
     ps.println(keys.get(keys.size() - 1));
   }
 
-  public synchronized static void writeData(PrintStream ps, Job job, List<Map<String, Object>> data) {
+  public synchronized static void writeData(PrintStream ps, Job job, Iterable<Map<String, Object>> data) {
     List<String> keys = jobKeys(job);
     for (Map<String, Object> dataItem : data) {
       Map<String, Object> allData = new HashMap<>(dataItem);
@@ -120,11 +112,7 @@ public class DistributedUtils {
           V v = entry.getValue().get(millis, TimeUnit.MILLISECONDS);
           futures.remove(entry.getKey());
           return new Pair<>(entry.getKey(), v);
-        } catch (InterruptedException ex) {
-          //ignore
-        } catch (ExecutionException ex) {
-          //ignore
-        } catch (TimeoutException ex) {
+        } catch (InterruptedException | TimeoutException | ExecutionException ex) {
           //ignore
         }
       }

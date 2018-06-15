@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -69,9 +68,7 @@ public class Master implements JobExecutor {
   static {
     try {
       LogManager.getLogManager().readConfiguration(Master.class.getClassLoader().getResourceAsStream("logging.properties"));
-    } catch (IOException ex) {
-      //ignore
-    } catch (SecurityException ex) {
+    } catch (IOException | SecurityException ex) {
       //ignore
     }
   }
@@ -82,8 +79,8 @@ public class Master implements JobExecutor {
     this.baseResultFileName = baseResultFileName;
     mainExecutor = Executors.newCachedThreadPool();
     scheduledExecutor = Executors.newScheduledThreadPool(Runtime.getRuntime().availableProcessors());
-    clients = Collections.synchronizedMap(new TreeMap<String, ClientInfo>());
-    jobs = Collections.synchronizedMap(new HashMap<String, JobInfo>());
+    clients = Collections.synchronizedMap(new TreeMap<>());
+    jobs = Collections.synchronizedMap(new HashMap<>());
     logs = EvictingQueue.create(UIRunnable.LOG_QUEUE_SIZE);
     printStreamFactory = new PrintStreamFactory(baseResultDirName);
   }
@@ -127,7 +124,7 @@ public class Master implements JobExecutor {
   @Override
   public Future<List<Node>> submit(final Job job) {
     jobs.put(job.getId(), new JobInfo(job));
-    return new Future<List<Node>>() {
+    return new Future<>() {
       @Override
       public boolean cancel(boolean mayInterruptIfRunning) {
         throw new UnsupportedOperationException("Not supported yet.");
@@ -144,7 +141,7 @@ public class Master implements JobExecutor {
       }
 
       @Override
-      public List<Node> get() throws InterruptedException, ExecutionException {
+      public List<Node> get() throws InterruptedException {
         while (true) {
           try {
             return get(-1, TimeUnit.MILLISECONDS);
@@ -155,7 +152,7 @@ public class Master implements JobExecutor {
       }
 
       @Override
-      public List<Node> get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+      public List<Node> get(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
         long elapsed = 0;
         while (true) {
           long m = System.currentTimeMillis();
@@ -259,7 +256,7 @@ public class Master implements JobExecutor {
   }
   
   public Set<JobInfo> getClientJobIds(String clientName) {
-    Set<JobInfo> jobInfos = Collections.synchronizedSet(new HashSet<JobInfo>());
+    Set<JobInfo> jobInfos = Collections.synchronizedSet(new HashSet<>());
     for (JobInfo jobInfo : jobs.values()) {
       if (JobInfo.Status.ONGOING.equals(jobInfo.getStatus())&&clientName.equals(jobInfo.getClientName())) {
         jobInfos.add(jobInfo);

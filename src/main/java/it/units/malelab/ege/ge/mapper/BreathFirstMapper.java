@@ -29,21 +29,21 @@ public class BreathFirstMapper<T> extends AbstractMapper<BitsGenotype, T> {
     this.maxWraps = maxWraps;
   }
 
-  private class EnhancedSymbol<T> {
+  private static class EnhancedSymbol<T> {
 
     private final T symbol;
     private final int depth;
 
-    public EnhancedSymbol(T symbol, int depth) {
+    EnhancedSymbol(T symbol, int depth) {
       this.symbol = symbol;
       this.depth = depth;
     }
 
-    public T getSymbol() {
+    T getSymbol() {
       return symbol;
     }
 
-    public int getDepth() {
+    int getDepth() {
       return depth;
     }
 
@@ -67,9 +67,9 @@ public class BreathFirstMapper<T> extends AbstractMapper<BitsGenotype, T> {
       int minDepth = Integer.MAX_VALUE;
       Node<EnhancedSymbol<T>> nodeToBeReplaced = null;
       for (Node<EnhancedSymbol<T>> node : enhancedTree.leafNodes()) {
-        if (grammar.getRules().keySet().contains(node.getContent().getSymbol())&&(node.getContent().getDepth()<minDepth)) {
+          if (((Map<T, List<List<T>>>) grammar).keySet().contains(node.content.getSymbol())&&(node.content.getDepth()<minDepth)) {
           nodeToBeReplaced = node;
-          minDepth = node.getContent().getDepth();
+              minDepth = node.content.getDepth();
         }
       }
       if (nodeToBeReplaced==null) {
@@ -83,7 +83,7 @@ public class BreathFirstMapper<T> extends AbstractMapper<BitsGenotype, T> {
           throw new MappingException(String.format("Too many wraps (%d>%d)", wraps, maxWraps));
         }
       }
-      List<List<T>> options = grammar.getRules().get(nodeToBeReplaced.getContent().getSymbol());
+        List<List<T>> options = ((Map<T, List<List<T>>>) grammar).get(nodeToBeReplaced.content.getSymbol());
       int optionIndex = genotype.slice(currentCodonIndex * codonLenght, (currentCodonIndex + 1) * codonLenght).toInt() % options.size();
       //update usages
       for (int i = currentCodonIndex*codonLenght; i<(currentCodonIndex+1)*codonLenght; i++) {
@@ -91,8 +91,8 @@ public class BreathFirstMapper<T> extends AbstractMapper<BitsGenotype, T> {
       }
       //add children
       for (T t : options.get(optionIndex)) {
-        Node<EnhancedSymbol<T>> newChild = new Node<>(new EnhancedSymbol<>(t, nodeToBeReplaced.getContent().getDepth()+1));
-        nodeToBeReplaced.getChildren().add(newChild);
+          Node<EnhancedSymbol<T>> newChild = new Node<>(new EnhancedSymbol<>(t, nodeToBeReplaced.content.getDepth() + 1));
+        nodeToBeReplaced.children.add(newChild);
       }
       currentCodonIndex = currentCodonIndex+1;
     }
@@ -102,9 +102,9 @@ public class BreathFirstMapper<T> extends AbstractMapper<BitsGenotype, T> {
   }
   
   private Node<T> extractFromEnhanced(Node<EnhancedSymbol<T>> enhancedNode) {
-    Node<T> node = new Node<>(enhancedNode.getContent().getSymbol());
-    for (Node<EnhancedSymbol<T>> enhancedChild : enhancedNode.getChildren()) {
-      node.getChildren().add(extractFromEnhanced(enhancedChild));
+      Node<T> node = new Node<>(enhancedNode.content.getSymbol());
+    for (Node<EnhancedSymbol<T>> enhancedChild : enhancedNode.children) {
+      node.children.add(extractFromEnhanced(enhancedChild));
     }
     return node;
   }

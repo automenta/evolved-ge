@@ -18,15 +18,15 @@ import java.util.Random;
  *
  * @author eric
  */
-public class BinaryRegex extends Problem<String, MultiObjectiveFitness<Double>> {
+class BinaryRegex extends Problem<String, MultiObjectiveFitness<Double>> {
 
-  private final static BinaryClassification<String, String> DATASET = new RegexMatch("01", 20, 100, new Random(1l), "0+1?0+", "1010.+0101", "111.+", "1?0.+01?");
+  private final static BinaryClassification<String, String> DATASET = new RegexMatch("01", 20, 100, new Random(1L), "0+1?0+", "1010.+0101", "111.+", "1?0.+01?");
 
   public BinaryRegex() throws IOException {
     super(Utils.parseFromFile(new File("grammars/binary-regex.bnf")),
             DATASET.subset(0, 0.8),
             DATASET.subset(0.8, 1),
-            new LeavesJoiner<String>()
+            new LeavesJoiner<>()
     );
   }
 
