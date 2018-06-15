@@ -189,7 +189,7 @@ public class GOMEvolver<G extends ConstrainedSequence, T, F extends Fitness> ext
           G donorGenotype = donor.genotype;
           G childGenotype = (G) child.genotype.clone();
           for (Integer locus: subset) {
-            childGenotype.set(locus, donorGenotype.get(locus));
+            childGenotype.replace(locus, donorGenotype.content(locus));
           }
           //map
           Stopwatch stopwatch = Stopwatch.createStarted();

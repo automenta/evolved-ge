@@ -48,7 +48,7 @@ public class BitsGenotype implements ConstrainedSequence<Boolean> {
   }
 
   @Override
-  public int size() {
+  public int leaves() {
     return length;
   }
 
@@ -73,8 +73,8 @@ public class BitsGenotype implements ConstrainedSequence<Boolean> {
   }
 
   public void set(int fromIndex, BitsGenotype other) {
-    checkIndexes(fromIndex, fromIndex + other.size());
-    for (int i = 0; i < other.size(); i++) {
+    checkIndexes(fromIndex, fromIndex + other.leaves());
+    for (int i = 0; i < other.leaves(); i++) {
       bitSet.set(fromIndex + i, other.bitSet.get(i));
     }
   }
@@ -93,7 +93,7 @@ public class BitsGenotype implements ConstrainedSequence<Boolean> {
   }
 
   @Override
-  public Boolean get(int index) {
+  public Boolean content(int index) {
     checkIndexes(index, index + 1);
     return bitSet.get(index);
   }
@@ -134,7 +134,7 @@ public class BitsGenotype implements ConstrainedSequence<Boolean> {
     BitsGenotype compressed = new BitsGenotype(newLength);
     List<BitsGenotype> slices = slices(Utils.slices(Range.closedOpen(0, length), newLength));
     for (int i = 0; i < slices.size(); i++) {
-      compressed.bitSet.set(i, slices.get(i).count() > slices.get(i).size() / 2);
+      compressed.bitSet.set(i, slices.get(i).count() > slices.get(i).leaves() / 2);
     }
     return compressed;
   }
@@ -197,7 +197,7 @@ public class BitsGenotype implements ConstrainedSequence<Boolean> {
   }
 
   @Override
-  public void set(int index, Boolean t) {
+  public void replace(int index, Boolean t) {
     checkIndexes(index, index + 1);
     bitSet.set(index, t);
   }

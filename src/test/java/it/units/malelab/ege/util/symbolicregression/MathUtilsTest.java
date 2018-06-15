@@ -43,7 +43,7 @@ public class MathUtilsTest {
     f.children.add(new Node<>("<expr>"));
     f.children.get(0).children.add(new Node<>("+"));
     f.children.get(1).children.add(new Node<>("<var>"));
-    f.children.get(2).children.add(new Node<>("<var>"));
+    f.children.get(2).add(new Node<>("<var>"));
     f.children.get(1).children.get(0).children.add(new Node<>("a"));
       f.children.get(2).children.get(0).children.add(new Node<>("b"));
     double[] result = MathUtils.compute(MathUtils.transform(f), flatMap, 3);

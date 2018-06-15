@@ -92,7 +92,7 @@ public class GrowTreeFactory<T> implements Factory<Node<T>> {
                 if (child == null) {
                     return null;
                 }
-                tree.children.add(child);
+                ((List<Node<T>>) tree).add(child);
             }
         }
         return tree;

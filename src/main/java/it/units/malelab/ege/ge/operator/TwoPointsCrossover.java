@@ -24,16 +24,16 @@ public class TwoPointsCrossover extends AbstractCrossover<BitsGenotype> {
     BitsGenotype parent2 = parents.get(1);
     int pivot1, pivot2;
     int startIndex1, startIndex2, endIndex1, endIndex2;
-    pivot1 = random.nextInt(parent1.size() - 1);
+    pivot1 = random.nextInt(parent1.leaves() - 1);
     do {
-      pivot2 = random.nextInt(parent1.size() - 1);
+      pivot2 = random.nextInt(parent1.leaves() - 1);
     } while (pivot1 == pivot2);
     startIndex1 = Math.min(pivot2, pivot1);
     endIndex1 = Math.max(pivot2, pivot1);
 
-    pivot1 = 1 + random.nextInt(parent2.size() - 1);
+    pivot1 = 1 + random.nextInt(parent2.leaves() - 1);
     do {
-      pivot2 = 1 + random.nextInt(parent2.size() - 1);
+      pivot2 = 1 + random.nextInt(parent2.leaves() - 1);
     } while (pivot1 == pivot2);
     startIndex2 = Math.min(pivot2, pivot1);
     endIndex2 = Math.max(pivot2, pivot1);
@@ -48,8 +48,8 @@ public class TwoPointsCrossover extends AbstractCrossover<BitsGenotype> {
     int startIndex2 = range2.lowerEndpoint();
     int endIndex1 = range1.upperEndpoint();
     int endIndex2 = range2.upperEndpoint();
-    int child1Size = parent1.size() - (endIndex1 - startIndex1) + (endIndex2 - startIndex2);
-    int child2Size = parent2.size() - (endIndex2 - startIndex2) + (endIndex1 - startIndex1);
+    int child1Size = parent1.leaves() - (endIndex1 - startIndex1) + (endIndex2 - startIndex2);
+    int child2Size = parent2.leaves() - (endIndex2 - startIndex2) + (endIndex1 - startIndex1);
     BitsGenotype child1 = new BitsGenotype(child1Size);
     BitsGenotype child2 = new BitsGenotype(child2Size);
     if (startIndex1 > 0) {
@@ -60,11 +60,11 @@ public class TwoPointsCrossover extends AbstractCrossover<BitsGenotype> {
     }
     child1.set(startIndex1, parent2.slice(startIndex2, endIndex2));
     child2.set(startIndex2, parent1.slice(startIndex1, endIndex1));
-    if (endIndex1 < parent1.size()) {
-      child1.set(startIndex1 + endIndex2 - startIndex2, parent1.slice(endIndex1, parent1.size()));
+    if (endIndex1 < parent1.leaves()) {
+      child1.set(startIndex1 + endIndex2 - startIndex2, parent1.slice(endIndex1, parent1.leaves()));
     }
-    if (endIndex2 < parent2.size()) {
-      child2.set(startIndex2 + endIndex1 - startIndex1, parent2.slice(endIndex2, parent2.size()));
+    if (endIndex2 < parent2.leaves()) {
+      child2.set(startIndex2 + endIndex1 - startIndex1, parent2.slice(endIndex2, parent2.leaves()));
     }
     return Arrays.asList(child1, child2);
   }

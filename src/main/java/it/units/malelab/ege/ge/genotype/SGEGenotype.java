@@ -63,7 +63,7 @@ public class SGEGenotype<T> implements ConstrainedSequence<Integer> {
   }
 
   @Override
-  public int size() {
+  public int leaves() {
     int length = 0;
     for (List<Integer> gene : genes.values()) {
       length = length + gene.size();
@@ -91,7 +91,7 @@ public class SGEGenotype<T> implements ConstrainedSequence<Integer> {
   }
 
   @Override
-  public Integer get(int index) {
+  public Integer content(int index) {
     Pair<Pair<T, Integer>, Integer> geneIndex = geneIndexes.get(index);
     if (geneIndex==null) {
       throw new IndexOutOfBoundsException();
@@ -110,7 +110,7 @@ public class SGEGenotype<T> implements ConstrainedSequence<Integer> {
   }
 
   @Override
-  public void set(int index, Integer t) {
+  public void replace(int index, Integer t) {
     if (domain(index).contains(t)) {
       Pair<Pair<T, Integer>, Integer> geneIndex = geneIndexes.get(index);
       if (geneIndex==null) {

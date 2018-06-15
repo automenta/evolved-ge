@@ -52,7 +52,7 @@ public class IndividualComparator<G, T, F extends Fitness> implements Comparator
                 v = Integer.compare(size(i1.phenotype.leafNodes()), size(i2.phenotype.leafNodes()));
             } else if (key.equals(Attribute.GENO_SIZE)) {
                 if (i1.genotype instanceof Sequence) {
-                    v = Integer.compare(((Sequence) i1.genotype).size(), ((Sequence) i2.genotype).size());
+                    v = Integer.compare(((Sequence) i1.genotype).leaves(), ((Sequence) i2.genotype).leaves());
                 } else {
                     v = 0;
                 }

@@ -13,9 +13,9 @@ import java.io.Serializable;
  */
 public interface Sequence<T> extends Serializable {
   
-  T get(int index);
-  void set(int index, T t);
-  int size();
+  T content(int index);
+  void replace(int index, T t);
+  int leaves();
   Sequence<T> clone();
   
 }

@@ -28,7 +28,7 @@ public class Grouped implements FOSBuilder {
   public Set<Set<Integer>> build(List<ConstrainedSequence> sequences, Random random) {
     int minMaxIndex = Integer.MAX_VALUE;
     for (Sequence sequence : sequences) {
-      minMaxIndex = Math.min(minMaxIndex, sequence.size());
+      minMaxIndex = Math.min(minMaxIndex, sequence.leaves());
     }
     Set<Set<Integer>> fos = new LinkedHashSet<>();
     for (int i = 0; i<Math.floor((double)minMaxIndex/ groupSize); i++) {

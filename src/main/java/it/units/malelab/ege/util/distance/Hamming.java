@@ -15,12 +15,12 @@ public class Hamming<T> implements Distance<Sequence<T>>{
 
   @Override
   public double d(Sequence<T> t1, Sequence<T> t2) {
-    if (t1.size()!=t2.size()) {
-      throw new IllegalArgumentException(String.format("Sequences size should be the same (%d vs. %d)", t1.size(), t2.size()));
+    if (t1.leaves()!=t2.leaves()) {
+      throw new IllegalArgumentException(String.format("Sequences size should be the same (%d vs. %d)", t1.leaves(), t2.leaves()));
     }
     int count = 0;
-    for (int i = 0; i<t1.size(); i++) {
-      if (!t1.get(i).equals(t2.get(i))) {
+    for (int i = 0; i<t1.leaves(); i++) {
+      if (!t1.content(i).equals(t2.content(i))) {
         count = count+1;
       }
     }

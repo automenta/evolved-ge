@@ -54,11 +54,11 @@ public class StandardTreeCrossover<T> extends AbstractCrossover<Node<T>> {
                 int subtree1Depth = subtree1.depth();
                 for (Node<T> subtree2: subtrees2) {
                     if ((subtree1AncestorsSize + subtree2.depth() <= maxDepth) && (Iterables.size(subtree2.getAncestors()) + subtree1Depth <= maxDepth)) {
-                        Collection<Node<T>> swappingChildren = new ArrayList<>(subtree1.children);
-                        subtree1.children.clear();
-                        subtree1.children.addAll(subtree2.children);
-                        subtree2.children.clear();
-                        subtree2.children.addAll(swappingChildren);
+                        Collection<Node<T>> swappingChildren = new ArrayList<>(subtree1);
+                        subtree1.clear();
+                        subtree1.addAll(subtree2);
+                        subtree2.clear();
+                        subtree2.addAll(swappingChildren);
                         done = true;
                         break;
                     }
@@ -79,11 +79,11 @@ public class StandardTreeCrossover<T> extends AbstractCrossover<Node<T>> {
     }
 
     private void populateMultimap(Node<T> node, Multimap<T, Node<T>> multimap) {
-        if (node.children.isEmpty()) {
+        if (node.isEmpty()) {
             return;
         }
         multimap.put(node.content, node);
-        for (Node<T> child: node.children) {
+        for (Node<T> child: node) {
             populateMultimap(child, multimap);
         }
 

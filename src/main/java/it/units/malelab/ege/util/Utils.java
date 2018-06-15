@@ -156,7 +156,7 @@ public class Utils {
         if (children.isEmpty()) {
             return null;
         }
-        node.children.addAll(children);
+        ((List<Node<T>>) node).addAll(children);
         node.propagateParentship();
         return node;
     }
@@ -166,7 +166,7 @@ public class Utils {
             return tree;
         }
         Node<T> foundNode = null;
-        for (Node<T> child: tree.children) {
+        for (Node<T> child: tree) {
             foundNode = findNodeWithContent(child, content);
             if (foundNode != null) {
                 break;
@@ -372,24 +372,24 @@ public class Utils {
     public static <T> Sequence<T> from(final List<T> list) {
         return new Sequence<>() {
             @Override
-            public T get(int index) {
+            public T content(int index) {
                 return list.get(index);
             }
 
             @Override
-            public int size() {
+            public int leaves() {
                 return list.size();
             }
 
             @Override
             @Deprecated
             public Sequence<T> clone() {
-                //return from(new ArrayList<T>(list));
-                return this;
+                return from(new ArrayList<T>(list));
+                //return this;
             }
 
             @Override
-            public void set(int index, T t) {
+            public void replace(int index, T t) {
                 throw new UnsupportedOperationException("Cannot set in read-only view of a list");
             }
         };
@@ -481,12 +481,12 @@ public class Utils {
         return StatUtils.mean(values);
     }
 
-    private static void collectLeafDepths(Node tree, int d, List<Double> depths) {
-        if (((List<Node>) tree.children).isEmpty()) {
+    private static void collectLeafDepths(Node<?> tree, int d, List<Double> depths) {
+        if (tree.isEmpty()) {
             depths.add((double) d);
             return;
         }
-        for (Node child: (List<Node>) (List<Node>) tree.children) {
+        for (Node<?> child: tree) {
             collectLeafDepths(child, d + 1, depths);
         }
     }

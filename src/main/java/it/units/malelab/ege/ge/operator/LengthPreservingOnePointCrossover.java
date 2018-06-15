@@ -21,16 +21,16 @@ public class LengthPreservingOnePointCrossover extends AbstractCrossover<BitsGen
   public List<BitsGenotype> apply(List<BitsGenotype> parents, Random random) {
     BitsGenotype parent1 = parents.get(0);
     BitsGenotype parent2 = parents.get(1);
-    int cutPointIndex1 = Math.min(Math.max(1, random.nextInt(parent1.size())), parent1.size()-1);
-    int cutPointIndex2 = parent2.size()-(parent1.size()-cutPointIndex1);
-    int child1Size = cutPointIndex1+(parent2.size()-cutPointIndex2);
-    int child2Size = cutPointIndex2+(parent1.size()-cutPointIndex1);
+    int cutPointIndex1 = Math.min(Math.max(1, random.nextInt(parent1.leaves())), parent1.leaves()-1);
+    int cutPointIndex2 = parent2.leaves()-(parent1.leaves()-cutPointIndex1);
+    int child1Size = cutPointIndex1+(parent2.leaves()-cutPointIndex2);
+    int child2Size = cutPointIndex2+(parent1.leaves()-cutPointIndex1);
     BitsGenotype child1 = new BitsGenotype(child1Size);
     BitsGenotype child2 = new BitsGenotype(child2Size);
     child1.set(0, parent1.slice(0, cutPointIndex1));
     child2.set(0, parent2.slice(0, cutPointIndex2));
-    child1.set(cutPointIndex1, parent2.slice(cutPointIndex2, parent2.size()));
-    child2.set(cutPointIndex2, parent1.slice(cutPointIndex1, parent1.size()));
+    child1.set(cutPointIndex1, parent2.slice(cutPointIndex2, parent2.leaves()));
+    child2.set(cutPointIndex2, parent1.slice(cutPointIndex1, parent1.leaves()));
     List<BitsGenotype> children = new ArrayList<>();
     children.add(child1);
     children.add(child2);

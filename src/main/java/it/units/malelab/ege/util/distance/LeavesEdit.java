@@ -19,7 +19,7 @@ public class LeavesEdit<T> implements Distance<Node<T>> {
   @Override
   public double d(Node<T> t1, Node<T> t2) {
     if (Node.EMPTY_TREE.equals(t1) || Node.EMPTY_TREE.equals(t2)) {
-      return Math.max(t1.size(), t2.size());
+      return Math.max(t1.leaves(), t2.leaves());
     }
     return distance.d(t1.leafContents(), t2.leafContents());
   }

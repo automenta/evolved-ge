@@ -33,7 +33,7 @@ public class Population<G extends Sequence, T, F extends Fitness> implements Col
     for (List<Individual<G, T, F>> rank : rankedPopulation) {
       for (Individual<G, T, F> individual : rank) {
         count = count+1;
-        genoSizeSum = genoSizeSum+ individual.genotype.size();
+        genoSizeSum = genoSizeSum+ individual.genotype.leaves();
           phenoSizeSum = phenoSizeSum + size(individual.phenotype.leafNodes());
         birthDateSum = birthDateSum+ individual.birthDate;
       }

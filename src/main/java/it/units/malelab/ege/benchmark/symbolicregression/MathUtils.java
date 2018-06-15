@@ -39,9 +39,9 @@ public class MathUtils {
       Arrays.fill(result, ((Constant) node.content).getValue());
       return result;
     }
-    double[][] childrenValues = new double[node.children.size()][];
+    double[][] childrenValues = new double[node.size()][];
     int i = 0;
-    for (Node<Element> child : node.children) {
+    for (Node<Element> child : node) {
       double[] childValues = compute(child, values, length);
       if (childValues!=null) {
         childrenValues[i] = childValues;
@@ -79,15 +79,15 @@ public class MathUtils {
   }
 
   public static Node<Element> transform(Node<String> stringNode) {
-    if (stringNode.children.isEmpty()) {
+    if (stringNode.isEmpty()) {
       return new Node<>(fromString(stringNode.content));
     }
-    if (stringNode.children.size()==1) {
-      return transform(stringNode.children.get(0));
+    if (stringNode.size()==1) {
+      return transform(stringNode.get(0));
     }
-    Node<Element> node = transform(stringNode.children.get(0));
-    for (int i = 1; i< stringNode.children.size(); i++) {
-      node.children.add(transform(stringNode.children.get(i)));
+    Node<Element> node = transform(stringNode.get(0));
+    for (int i = 1; i< stringNode.size(); i++) {
+      node.add(transform(stringNode.get(i)));
     }
     return node;
   }

@@ -32,9 +32,9 @@ public class StandardGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
 
   @Override
   public Node<T> map(BitsGenotype genotype, Map<String, Object> report) throws MappingException {
-    int[] bitUsages = new int[genotype.size()];
-    if (genotype.size()<codonLenght) {
-      throw new MappingException(String.format("Short genotype (%d<%d)", genotype.size(), codonLenght));
+    int[] bitUsages = new int[genotype.leaves()];
+    if (genotype.leaves()<codonLenght) {
+      throw new MappingException(String.format("Short genotype (%d<%d)", genotype.leaves(), codonLenght));
     }
     Node<T> tree = new Node<>(grammar.getStartingSymbol());
     int currentCodonIndex = 0;
@@ -51,7 +51,7 @@ public class StandardGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
         break;
       }
       //get codon index and option
-      if ((currentCodonIndex+1)*codonLenght>genotype.size()) {
+      if ((currentCodonIndex+1)*codonLenght>genotype.leaves()) {
         wraps = wraps+1;
         currentCodonIndex = 0;
         if (wraps>maxWraps) {

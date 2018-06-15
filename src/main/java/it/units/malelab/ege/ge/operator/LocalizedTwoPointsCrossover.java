@@ -21,14 +21,14 @@ public class LocalizedTwoPointsCrossover extends TwoPointsCrossover {
     BitsGenotype parent0 = parents.get(0);
     BitsGenotype parent1 = parents.get(1);
     int pivot1, pivot2;
-    pivot1 = random.nextInt(parent0.size());
+    pivot1 = random.nextInt(parent0.leaves());
     do {
-      pivot2 = random.nextInt(parent0.size());
+      pivot2 = random.nextInt(parent0.leaves());
     } while (pivot1 == pivot2);
     int startIndex0 = Math.min(pivot2, pivot1);
     int endIndex0 = Math.max(pivot2, pivot1);
-    int startIndex1 = (int) Math.round((double) startIndex0 * parent1.size() / parent0.size());
-    int endIndex1 = Math.min(Math.max((int) Math.round((double) endIndex0 * parent1.size() / parent0.size()), startIndex1+1), parent1.size());
+    int startIndex1 = (int) Math.round((double) startIndex0 * parent1.leaves() / parent0.leaves());
+    int endIndex1 = Math.min(Math.max((int) Math.round((double) endIndex0 * parent1.leaves() / parent0.leaves()), startIndex1+1), parent1.leaves());
     return children(
             parent0, Range.closedOpen(startIndex0, endIndex0),
             parent1, Range.closedOpen(startIndex1, endIndex1));

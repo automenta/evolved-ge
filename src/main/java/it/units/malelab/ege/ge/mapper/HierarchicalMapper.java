@@ -119,10 +119,10 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
 
   @Override
   public Node<T> map(BitsGenotype genotype, Map<String, Object> report) {
-    int[] bitUsages = new int[genotype.size()];
+    int[] bitUsages = new int[genotype.leaves()];
     Node<T> tree;
     if (recursive) {
-      tree = mapRecursively(grammar.getStartingSymbol(), Range.closedOpen(0, genotype.size()), genotype, bitUsages);
+      tree = mapRecursively(grammar.getStartingSymbol(), Range.closedOpen(0, genotype.leaves()), genotype, bitUsages);
     } else {
       tree = mapIteratively(genotype, bitUsages);
     }
@@ -157,7 +157,7 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
   }
   
   double optionSliceWeigth(BitsGenotype slice) {
-    return (double) slice.count() / slice.size();
+    return (double) slice.count() / slice.leaves();
   }
 
   private List<T> chooseOption(BitsGenotype genotype, Range<Integer> range, List<List<T>> options) {
@@ -185,7 +185,7 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
   }
 
   private Node<T> mapIteratively(BitsGenotype genotype, int[] bitUsages) {
-    Node<EnhancedSymbol<T>> enhancedTree = new Node<>(new EnhancedSymbol<>(grammar.getStartingSymbol(), Range.closedOpen(0, genotype.size())));
+    Node<EnhancedSymbol<T>> enhancedTree = new Node<>(new EnhancedSymbol<>(grammar.getStartingSymbol(), Range.closedOpen(0, genotype.leaves())));
     while (true) {
       Node<EnhancedSymbol<T>> nodeToBeReplaced = null;
       for (Node<EnhancedSymbol<T>> node : enhancedTree.leafNodes()) {

@@ -74,7 +74,7 @@ public class EvolutionImageSaverListener<G extends ConstrainedSequence, T, F ext
     //update best usages
     Individual<G, T, F> best = rankedPopulation.get(0).get(0);
     if (types.contains(ImageType.BEST_USAGE)) {
-      double[] bestUsages = new double[best.genotype.size()];
+      double[] bestUsages = new double[best.genotype.leaves()];
       int[] bitUsages = (int[]) best.otherInfo.get(StandardGEMapper.BIT_USAGES_INDEX_NAME);
       if (bitUsages != null) {
         double maxUsage = 0;
@@ -89,23 +89,23 @@ public class EvolutionImageSaverListener<G extends ConstrainedSequence, T, F ext
     }
     //update diversities
     if (types.contains(ImageType.DIVERSITY) || types.contains(ImageType.DU)) {
-      Set[] domains = new Set[best.genotype.size()];
-      Multiset[] symbols = new Multiset[best.genotype.size()];
+      Set[] domains = new Set[best.genotype.leaves()];
+      Multiset[] symbols = new Multiset[best.genotype.leaves()];
       for (int i = 0; i < symbols.length; i++) {
         symbols[i] = HashMultiset.create();
         domains[i] = new LinkedHashSet();
       }
-      double[] counts = new double[best.genotype.size()];
+      double[] counts = new double[best.genotype.leaves()];
       for (List<Individual<G, T, F>> rank : rankedPopulation) {
         for (Individual<G, T, F> individual : rank) {
-          for (int i = 0; i < Math.min(best.genotype.size(), individual.genotype.size()); i++) {
+          for (int i = 0; i < Math.min(best.genotype.leaves(), individual.genotype.leaves()); i++) {
             counts[i] = counts[i] + 1;
-            symbols[i].add(individual.genotype.get(i));
+            symbols[i].add(individual.genotype.content(i));
             domains[i].addAll(individual.genotype.domain(i));
           }
         }
       }
-      double[] diversities = new double[best.genotype.size()];
+      double[] diversities = new double[best.genotype.leaves()];
       for (int i = 0; i < symbols.length; i++) {
         diversities[i] = Utils.multisetDiversity(symbols[i], domains[i]);
       }
@@ -113,7 +113,7 @@ public class EvolutionImageSaverListener<G extends ConstrainedSequence, T, F ext
     }
     //update usages
     if (types.contains(ImageType.USAGE) || types.contains(ImageType.DU)) {
-      double[] usages = new double[best.genotype.size()];
+      double[] usages = new double[best.genotype.leaves()];
       double count = 0;
       for (List<Individual<G, T, F>> rank : rankedPopulation) {
         for (Individual<G, T, F> individual : rank) {

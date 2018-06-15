@@ -187,7 +187,7 @@ public class KLandscapes extends Problem<String, NumericFitness> {
     if (Node.EMPTY_TREE.equals(original)) {
       return Node.EMPTY_TREE;
     }
-    Node<String> node = new Node<>(original.children.get(0).children.get(0).content);
+    Node<String> node = new Node<>(original.children.get(0).get(0).content);
     if (original.children.size() > 1) {
       //is a non terminal node
       for (Node<String> orginalChild : original.children) {

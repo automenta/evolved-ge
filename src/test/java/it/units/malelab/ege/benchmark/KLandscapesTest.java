@@ -103,7 +103,7 @@ public class KLandscapesTest {
         for (Node<String> leftChild : subtrees) {
           for (Node<String> rigthChild : subtrees) {
             Node<String> node = new Node<>("n" + i);
-              node.children.add(leftChild);
+              ( node).add(leftChild);
               node.children.add(rigthChild);
             all.add(node);
           }
@@ -121,9 +121,9 @@ public class KLandscapesTest {
       t.children.add(new Node<>("n1"));
       t.children.add(new Node<>("n1"));
       t.children.get(0).children.add(new Node<>("t2"));
-      t.children.get(0).children.add(new Node<>("t2"));
-    t.children.get(1).children.add(new Node<>("t2"));
-    t.children.get(1).children.add(new Node<>("t2"));
+      t.children.get(0).add(new Node<>("t2"));
+    ( t).get(1).children.add(new Node<>("t2"));
+    ( t).get(1).children.add(new Node<>("t2"));
     Node<String> result = KLandscapes.levelEqualTree(indexes, arity);
     assertEquals("Tree should be " + t, t, result);
   }
@@ -134,7 +134,7 @@ public class KLandscapesTest {
     subtrees.add(tree3);
     subtrees.add(tree3.children.get(0));
     subtrees.add(tree3.children.get(1));
-    subtrees.add(tree3.children.get(1).children.get(0));
+    subtrees.add(( tree3).get(1).children.get(0));
     subtrees.add(tree3.children.get(1).children.get(1));
     for (int k = 0; k < 5; k++) {
       double maxFk = Double.NEGATIVE_INFINITY;

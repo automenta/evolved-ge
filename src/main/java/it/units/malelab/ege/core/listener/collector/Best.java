@@ -58,7 +58,7 @@ public abstract class Best<G extends Sequence, T, F extends Fitness> implements 
                         fitnessEntry.getValue());
             }
         }
-        indexes.put("best.genotype.size", best.genotype.size());
+        indexes.put("best.genotype.size", best.genotype.leaves());
         indexes.put("best.phenotype.size", size(best.phenotype.leafNodes()));
         indexes.put("best.phenotype.nodeSize", best.phenotype.nodeSize());
         indexes.put("best.phenotype.depth", best.phenotype.depth());

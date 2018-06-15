@@ -77,7 +77,7 @@ public final class MapperGenerationValidatorDistributedExperimenter extends Mapp
       s.append('\t');
     }
     s.append("[. {\\gft{").append(t.content.toString().toLowerCase().replaceAll("_", ".")).append("}}");
-      for (Node<Element> child : t.children) {
+      for (Node<Element> child : t) {
       s.append('\n').append(pe(child, d + 1));
     }
     s.append(" ]");
@@ -140,7 +140,7 @@ public final class MapperGenerationValidatorDistributedExperimenter extends Mapp
             System.out.println(currentMap.get(selectedSerializedMapper));
             System.out.println(t);
             System.out.println(t.depth());
-            System.out.println(t.size());
+            System.out.println(t.leaves());
             System.out.println(t.nodeSize());
             System.exit(0);
           }

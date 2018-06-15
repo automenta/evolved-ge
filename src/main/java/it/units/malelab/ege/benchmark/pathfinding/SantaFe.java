@@ -20,7 +20,7 @@ public class SantaFe implements FitnessComputer<String, NumericFitness> {
 
   @Override
   public NumericFitness compute(Node<String> phenotypeRoot) {
-    List<Node<String>> phenotype = phenotypeRoot.leafNodesList();
+    List<Node<String>> phenotype = phenotypeRoot.leafNodes();
     Trail trail = new Trail(); //Trail to travese
     double fitness = trail.getFood(); //Initial fitness
     try {

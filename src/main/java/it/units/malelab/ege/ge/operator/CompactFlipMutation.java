@@ -20,10 +20,10 @@ public class CompactFlipMutation extends AbstractMutation<BitsGenotype> {
   @Override
   public List<BitsGenotype> apply(List<BitsGenotype> parents, Random random) {
     BitsGenotype parent = parents.get(0);
-    BitsGenotype child = new BitsGenotype(parent.size());
+    BitsGenotype child = new BitsGenotype(parent.leaves());
     child.set(0, parent);
-    int fromIndex = random.nextInt(child.size()-1);
-    int size = Math.max(1, random.nextInt(child.size()-fromIndex));
+    int fromIndex = random.nextInt(child.leaves()-1);
+    int size = Math.max(1, random.nextInt(child.leaves()-fromIndex));
     child.flip(fromIndex, fromIndex+size);
     return Collections.singletonList(child);
   }  

@@ -26,26 +26,26 @@ public class LengthChanger extends AbstractMutation<BitsGenotype> {
   @Override
   public List<BitsGenotype> apply(List<BitsGenotype> parents, Random random) {
     BitsGenotype parent = parents.get(0);
-    int newBits = (int)Math.round(parent.size() *random.nextDouble()*maxRatio);
+    int newBits = (int)Math.round(parent.leaves() *random.nextDouble()*maxRatio);
     if (newBits==0) {
-      return Collections.singletonList(new BitsGenotype(parent.size(), parent.asBitSet()));
+      return Collections.singletonList(new BitsGenotype(parent.leaves(), parent.asBitSet()));
     }
     boolean shorter = random.nextBoolean();
     BitsGenotype child;
     if (shorter) {
-      int index = random.nextInt(parent.size()-newBits)+newBits;
-      child = new BitsGenotype(parent.size()-newBits);
+      int index = random.nextInt(parent.leaves()-newBits)+newBits;
+      child = new BitsGenotype(parent.leaves()-newBits);
       if ((index-newBits)>0) {
         child.set(0, parent.slice(0, index-newBits));
       }
-      child.set(index-newBits, parent.slice(index, parent.size()));
+      child.set(index-newBits, parent.slice(index, parent.leaves()));
     } else {
-      int index = random.nextInt(parent.size());
-      child = new BitsGenotype(parent.size()+newBits);
+      int index = random.nextInt(parent.leaves());
+      child = new BitsGenotype(parent.leaves()+newBits);
       if (index>0) {
         child.set(0, parent.slice(0, index));
       }
-      child.set(index+newBits, parent.slice(index, parent.size()));
+      child.set(index+newBits, parent.slice(index, parent.leaves()));
     }
     return Collections.singletonList(child);
   }  

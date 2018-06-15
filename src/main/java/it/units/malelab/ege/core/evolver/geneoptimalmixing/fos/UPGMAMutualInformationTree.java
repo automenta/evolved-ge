@@ -35,7 +35,7 @@ public class UPGMAMutualInformationTree implements FOSBuilder {
   public Set<Set<Integer>> build(List<ConstrainedSequence> sequences, Random random) {
     int minMaxIndex = Integer.MAX_VALUE;
     for (Sequence sequence : sequences) {
-      minMaxIndex = Math.min(minMaxIndex, sequence.size());
+      minMaxIndex = Math.min(minMaxIndex, sequence.leaves());
     }
     //compute mutual information table
     Map<Pair<Set<Integer>, Set<Integer>>, Double> dMap = computeInitialDistanceMap(minMaxIndex, sequences, random);
@@ -96,8 +96,8 @@ public class UPGMAMutualInformationTree implements FOSBuilder {
         Object[] aValues = new Object[sequences.size()];
         Object[] bValues = new Object[sequences.size()];
         for (int s = 0; s < sequences.size(); s++) {
-          aValues[s] = sequences.get(s).get(i);
-          bValues[s] = sequences.get(s).get(j);
+          aValues[s] = sequences.get(s).content(i);
+          bValues[s] = sequences.get(s).content(j);
         }
         double localMi = computeMI(aValues, domains.get(i), bValues, domains.get(j));
         map.put(new Pair<>(Collections.singleton(i), Collections.singleton(j)), localMi);

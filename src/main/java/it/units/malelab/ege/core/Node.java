@@ -11,19 +11,23 @@ import it.units.malelab.ege.util.Utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.StreamSupport;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author eric
  */
-public class Node<T> implements Sequence<T>, Serializable {
+public class Node<T> extends ArrayList<Node<T>> implements Sequence<T>, Serializable, Iterable<Node<T>> {
 
     public static final Node EMPTY_TREE = new Node(null);
-
+    final static Node[] EmptyNodeArray = new Node[0];
     public final T content;
-    public final List<Node<T>> children = new ArrayList<>();
+    public final List<Node<T>> children = this;
     private Node<T> parent;
 
     public Node(T content) {
@@ -33,26 +37,32 @@ public class Node<T> implements Sequence<T>, Serializable {
     public Node(Node<T> original) {
         this(original != null ? original.content : null);
 
-        if (original!=null) {
+        if (original != null) {
             //new Node<>(child));
-            children.addAll(original.children);
+            addAll(original.children);
         }
     }
 
+    @Override
+    public Node<T> set(int index, Node<T> element) {
+        leaves = null;
+        return super.set(index, element);
+    }
 
-    public Iterable<Node<T>> leafNodes() {
-        if (children.isEmpty()) {
-            return List.of();
+    public List<Node<T>> leafNodes() {
+        if (leaves == null) {
+            if (isEmpty()) {
+                leaves = List.of(this);
+            } else {
+                List<Node<T>> l = new ArrayList();
+                for (Node n : this) {
+                    l.addAll(n.leafNodes());
+                }
+                leaves = l;
+            }
         }
-//        List<Node<T>> childContents = new ArrayList<>();
-//        for (Node<T> child: children) {
-//            childContents.addAll(child.leafNodes());
-//        }
-//        return childContents;
 
-        return ()->children.stream().flatMap(c ->
-                StreamSupport.stream(c.leafNodes().spliterator(), false))
-                .iterator();
+        return leaves;
     }
 
     @Override
@@ -61,7 +71,7 @@ public class Node<T> implements Sequence<T>, Serializable {
         sb.append(content);
         if (!children.isEmpty()) {
             sb.append('{');
-            for (Node<T> child: children) {
+            for (Node<T> child: this) {
                 sb.append(child).append(',');
             }
             sb.deleteCharAt(sb.length() - 1);
@@ -111,24 +121,33 @@ public class Node<T> implements Sequence<T>, Serializable {
     @Override
     public int hashCode() {
         int hash = 3;
-        hash = 53 * hash + Objects.hashCode(this.content);
-        hash = 53 * hash + Objects.hashCode(this.children);
+        hash = 53 * hash + content.hashCode();
+        hash = 53 * hash + super.hashCode();
         return hash;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof Node))
             return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
+//        if (getClass() != obj.getClass()) {
+//            return false;
+//        }
         final Node<?> other = (Node<?>) obj;
         if (!Objects.equals(this.content, other.content)) {
             return false;
         }
-        return Objects.equals(this.children, other.children);
+
+        int ss;
+        if ((ss = size())!=other.size()) return false;
+        for (int i = 0; i < ss; i++) {
+            if (!get(i).equals(other.get(i)))
+                return false;
+        }
+
+        return true;
     }
 
     public Sequence<T> leafContents() {
@@ -137,13 +156,18 @@ public class Node<T> implements Sequence<T>, Serializable {
     }
 
     @Override
-    public T get(int index) {
-        return Iterables.get(leafNodes(), index).content;
+    public T content(int index) {
+        return leafNodes().get(index).content;
     }
 
     @Override
-    public int size() {
-        return Iterables.size(leafNodes());
+    public void replace(int index, T t) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int leaves() {
+        return leafNodes().size();
     }
 
     @Override
@@ -151,12 +175,77 @@ public class Node<T> implements Sequence<T>, Serializable {
         return new Node<>(this);
     }
 
-    @Override
-    public void set(int index, T t) {
-        throw new UnsupportedOperationException("Set not supported on trees.");
-    }
 
-    public List<Node<T>> leafNodesList() {
-        return Lists.newArrayList(leafNodes());
-    }
+
+
+
+        /**
+         * cached leaf nodes
+         */
+        private List<Node<T>> leaves = List.of(this);
+
+        @Override
+        public boolean add(Node<T> tNode) {
+            leaves = null;
+            return super.add(tNode);
+        }
+
+        @Override
+        public boolean remove(Object tNode) {
+            leaves = null;
+            return super.remove(tNode);
+        }
+
+        @Override
+        public void add(int index, Node<T> element) {
+            leaves = null;
+            super.add(index, element);
+        }
+
+
+
+        @Override
+        public boolean addAll(int index, Collection<? extends Node<T>> c) {
+            leaves = null;
+            return super.addAll(index, c);
+        }
+
+        @Override
+        protected void removeRange(int fromIndex, int toIndex) {
+            leaves = null;
+            super.removeRange(fromIndex, toIndex);
+        }
+
+        @Override
+        public Node<T> remove(int index) {
+            leaves = null;
+            return super.remove(index);
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends Node<T>> c) {
+            leaves = null;
+            return super.addAll(c);
+        }
+
+        @Override
+        public boolean removeAll(Collection<?> c) {
+            leaves = null;
+            return super.removeAll(c);
+        }
+
+        @Override
+        public boolean removeIf(Predicate<? super Node<T>> filter) {
+            leaves = null;
+            return super.removeIf(filter);
+        }
+
+        @Override
+        public void clear() {
+            leaves = null;
+            super.clear();
+        }
+
+
+
 }

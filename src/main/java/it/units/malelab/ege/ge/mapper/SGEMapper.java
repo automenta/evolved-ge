@@ -76,7 +76,7 @@ public class SGEMapper<T> extends AbstractMapper<SGEGenotype<T>, T> {
     }
 
     public Node<T> map(SGEGenotype<T> genotype, Map<String, Object> report) {
-        int[] usages = new int[genotype.size()];
+        int[] usages = new int[genotype.leaves()];
         //map
         Multiset<Pair<T, Integer>> expandedSymbols = LinkedHashMultiset.create();
         Node<Pair<T, Integer>> tree = new Node<>(nonRecursiveGrammar.getStartingSymbol());
@@ -111,7 +111,7 @@ public class SGEMapper<T> extends AbstractMapper<SGEGenotype<T>, T> {
     private Node<T> transform(Node<Pair<T, Integer>> pairNode) {
         Node<T> node = new Node<>(pairNode.content.first);
         for (Node<Pair<T, Integer>> pairChild: pairNode.children) {
-            node.children.add(transform(pairChild));
+            ((List<Node<T>>) node).add(transform(pairChild));
         }
         return node;
     }
