@@ -38,8 +38,8 @@ public class StandardTreeMutation<T>  extends AbstractMutation<Node<T>> {
     for (Node<T> toReplaceSubTree : nonTerminalNodes) {
       Node<T> newSubTree = factory.build(random, toReplaceSubTree.content, toReplaceSubTree.depth());
       if (newSubTree!=null) {
-        toReplaceSubTree.children.clear();
-        toReplaceSubTree.children.addAll(newSubTree.children);
+        toReplaceSubTree.clear();
+        toReplaceSubTree.addAll(newSubTree);
         done = true;
         break;
       }
@@ -51,9 +51,10 @@ public class StandardTreeMutation<T>  extends AbstractMutation<Node<T>> {
   }
   
   private void getNonTerminalNodes(Node<T> node, List<Node<T>> nodes) {
-    if (!node.children.isEmpty()) {
+    if (!node.isEmpty()) {
       nodes.add(node);
-      for (Node<T> child : node.children) {
+      for (int i = 0, nodeSize = node.size(); i < nodeSize; i++) {
+        Node<T> child = node.get(i);
         getNonTerminalNodes(child, nodes);
       }
     }

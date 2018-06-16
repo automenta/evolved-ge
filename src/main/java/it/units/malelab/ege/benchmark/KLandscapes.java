@@ -94,7 +94,7 @@ public class KLandscapes extends Problem<String, NumericFitness> {
       return v.get(tree.content);
     }
     double sum = v.get(tree.content);
-    for (Node<String> child : tree.children) {
+    for (Node<String> child : tree) {
       final double weight = w.get(new Pair<>(tree.content, child.content));
       final double innerFK = fK(child, k - 1, v, w);
       sum = sum + (1 + weight) * innerFK;
@@ -133,14 +133,14 @@ public class KLandscapes extends Problem<String, NumericFitness> {
     }
     Node<String> node = new Node<>("n" + indexes[0]);
     for (int i = 0; i < arity; i++) {
-      node.children.add(levelEqualTree(Arrays.copyOfRange(indexes, 1, indexes.length), arity));
+      node.add(levelEqualTree(Arrays.copyOfRange(indexes, 1, indexes.length), arity));
     }
     return node;
   }
 
   static double maxFK(Node<String> tree, int k, Map<String, Double> v, Map<Pair<String, String>, Double> w) {
     double max = fK(tree, k, v, w);
-    for (Node<String> child : tree.children) {
+    for (Node<String> child : tree) {
       max = Math.max(max, maxFK(child, k, v, w));
     }
     return max;
@@ -187,12 +187,12 @@ public class KLandscapes extends Problem<String, NumericFitness> {
     if (Node.EMPTY_TREE.equals(original)) {
       return Node.EMPTY_TREE;
     }
-    Node<String> node = new Node<>(original.children.get(0).get(0).content);
-    if (original.children.size() > 1) {
+    Node<String> node = new Node<>(original.get(0).get(0).content);
+    if (original.size() > 1) {
       //is a non terminal node
-      for (Node<String> orginalChild : original.children) {
+      for (Node<String> orginalChild : original) {
         if (orginalChild.content.equals("N")) {
-          node.children.add(transform(orginalChild));
+          node.add(transform(orginalChild));
         }
       }
     }

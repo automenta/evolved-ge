@@ -6,6 +6,9 @@
 package it.units.malelab.ege;
 
 import it.units.malelab.ege.benchmark.KLandscapes;
+
+import it.units.malelab.ege.benchmark.SantaFe;
+import it.units.malelab.ege.benchmark.Text;
 import it.units.malelab.ege.cfggp.initializer.FullTreeFactory;
 import it.units.malelab.ege.cfggp.initializer.GrowTreeFactory;
 import it.units.malelab.ege.cfggp.mapper.CfgGpMapper;
@@ -34,6 +37,7 @@ import it.units.malelab.ege.core.operator.GeneticOperator;
 import it.units.malelab.ege.core.ranker.ComparableRanker;
 import it.units.malelab.ege.util.Utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,18 +52,22 @@ import java.util.concurrent.Executors;
  */
 public class ExampleMain {
 
-  public static void main(String[] args) throws InterruptedException, ExecutionException {
-    solveKLandscapesCfgGp();
+  public static void main(String[] args) throws InterruptedException, ExecutionException, IOException {
+    solveKLandscapesCfgGp(
+            //new KLandscapes(8)
+            new Text()
+            //new SantaFe()
+    );
   }
 
-  private static void solveKLandscapesCfgGp() throws InterruptedException, ExecutionException {
+  private static void solveKLandscapesCfgGp(Problem<String, NumericFitness> p) throws InterruptedException, ExecutionException {
     Random random = new Random(1L);
     ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1);
-    Problem<String, NumericFitness> problem = new KLandscapes(8);
-    int maxDepth = 16;
+    Problem<String, NumericFitness> problem = p;
+    int maxDepth = 4;
     StandardConfiguration<Node<String>, String, NumericFitness> configuration = new StandardConfiguration<>(
             500,
-            50,
+            10,
             new MultiInitializer<>(new Utils.MapBuilder<PopulationInitializer<Node<String>>, Double>()
                     .put(new RandomInitializer<>(new GrowTreeFactory<>(maxDepth, problem.getGrammar())), 0.5)
                     .put(new RandomInitializer<>(new FullTreeFactory<>(maxDepth, problem.getGrammar())), 0.5)
@@ -90,6 +98,9 @@ public class ExampleMain {
     Evolver<Node<String>, String, NumericFitness> evolver = new StandardEvolver<>(configuration, false);
     List<Node<String>> bests = evolver.solve(executor, random, listeners);
     System.out.printf("Found %d solutions.%n", bests.size());
+    System.out.println(problem.getLearningFitnessComputer().compute(bests.get(0)));
+    System.out.println(problem.getLearningFitnessComputer().compute(bests.get(bests.size()-1)));
+    bests.forEach(x -> System.out.println(x));
   }
 
 }

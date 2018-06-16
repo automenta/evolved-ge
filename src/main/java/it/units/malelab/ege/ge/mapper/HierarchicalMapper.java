@@ -150,8 +150,8 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
 
   private Node<T> extractFromEnhanced(Node<EnhancedSymbol<T>> enhancedNode) {
       Node<T> node = new Node<>(enhancedNode.content.getSymbol());
-      for (Node<EnhancedSymbol<T>> enhancedChild : enhancedNode.children) {
-          node.children.add(extractFromEnhanced(enhancedChild));
+      for (Node<EnhancedSymbol<T>> enhancedChild : enhancedNode) {
+          node.add(extractFromEnhanced(enhancedChild));
     }
     return node;
   }
@@ -224,7 +224,7 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
                 symbols.get(i),
                 childRange
         ));
-          nodeToBeReplaced.children.add(newChild);
+          nodeToBeReplaced.add(newChild);
       }
     }
     //convert
@@ -262,7 +262,7 @@ public class HierarchicalMapper<T> extends AbstractMapper<BitsGenotype, T> {
         }
       }
       for (int i = 0; i < symbols.size(); i++) {
-          node.children.add(mapRecursively(symbols.get(i), childRanges.get(i), genotype, bitUsages));
+          node.add(mapRecursively(symbols.get(i), childRanges.get(i), genotype, bitUsages));
       }
     }
     return node;

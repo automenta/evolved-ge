@@ -85,7 +85,7 @@ public class PiGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
       //add children
       for (T t : options.get(optionIndex)) {
         Node<T> newChild = new Node<>(t);
-        nodeToBeReplaced.children.add(newChild);
+        nodeToBeReplaced.add(newChild);
       }
       currentCodonIndex = currentCodonIndex+1;
     }

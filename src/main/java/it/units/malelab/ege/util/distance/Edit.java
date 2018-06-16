@@ -20,12 +20,12 @@ public class Edit<T> implements Distance<Sequence<T>> {
           return 0;
 
     int len0 = ts1.leaves()+ 1;
-    int len1 = ts2.leaves()+ 1;
     int[] cost = new int[len0];
     int[] newcost = new int[len0];
     for (int i = 0; i < len0; i++) {
       cost[i] = i;
     }
+    int len1 = ts2.leaves()+ 1;
     for (int j = 1; j < len1; j++) {
       newcost[0] = j;
       for (int i = 1; i < len0; i++) {

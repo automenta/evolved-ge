@@ -28,8 +28,8 @@ public class RecursiveMapper<T> extends WeightedHierarchicalMapper<T> {
   public RecursiveMapper(Node<String> rawMappingTree, int maxMappingDepth, int maxDepth, Grammar<T> grammar) {
     super(maxDepth, grammar);
     this.maxMappingDepth = maxMappingDepth;
-    optionChooser = MapperUtils.transform(rawMappingTree.children.get(0));
-    genoAssigner = MapperUtils.transform(rawMappingTree.children.get(1));
+    optionChooser = MapperUtils.transform(rawMappingTree.get(0));
+    genoAssigner = MapperUtils.transform(rawMappingTree.get(1));
     optionChooser.propagateParentship();
     genoAssigner.propagateParentship();
   }
@@ -58,7 +58,7 @@ public class RecursiveMapper<T> extends WeightedHierarchicalMapper<T> {
       List<Integer> shortestOptionIndexTies = shortestOptionIndexesMap.get(symbol);
         List<T> shortestOption = ((Map<T, List<List<T>>>) grammar).get(symbol).get(shortestOptionIndexTies.get(finalizationGlobalCounter.rw() % shortestOptionIndexTies.size()));
       for (T optionSymbol : shortestOption) {
-        node.children.add(mapRecursively(optionSymbol, genotype, mappingGlobalCounter, finalizationGlobalCounter, depth + 1));
+        node.add(mapRecursively(optionSymbol, genotype, mappingGlobalCounter, finalizationGlobalCounter, depth + 1));
       }
       return node;
     }
@@ -89,7 +89,7 @@ public class RecursiveMapper<T> extends WeightedHierarchicalMapper<T> {
       } else {
         piece = new BitsGenotype(0);
       }
-      node.children.add(mapRecursively(
+      node.add(mapRecursively(
               options.get(optionIndex).get(i), piece, mappingGlobalCounter, finalizationGlobalCounter, depth + 1));
     }
     return node;

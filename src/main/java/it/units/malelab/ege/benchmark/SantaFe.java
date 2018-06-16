@@ -16,9 +16,9 @@ import java.io.IOException;
  *
  * @author eric
  */
-class SantaFe extends Problem<String, NumericFitness> {
+public class SantaFe extends Problem<String, NumericFitness> {
 
-  public SantaFe(String target) throws IOException {
+  public SantaFe() throws IOException {
     super(Utils.parseFromFile(new File("grammars/santa-fe.bnf")),
             new it.units.malelab.ege.benchmark.pathfinding.SantaFe(),
             null,

@@ -53,14 +53,19 @@ public class StandardTreeCrossover<T> extends AbstractCrossover<Node<T>> {
                 int subtree1AncestorsSize = Iterables.size(subtree1.getAncestors());
                 int subtree1Depth = subtree1.depth();
                 for (Node<T> subtree2: subtrees2) {
-                    if ((subtree1AncestorsSize + subtree2.depth() <= maxDepth) && (Iterables.size(subtree2.getAncestors()) + subtree1Depth <= maxDepth)) {
-                        Collection<Node<T>> swappingChildren = new ArrayList<>(subtree1);
-                        subtree1.clear();
-                        subtree1.addAll(subtree2);
-                        subtree2.clear();
-                        subtree2.addAll(swappingChildren);
-                        done = true;
-                        break;
+                    if (!subtree1.equals(subtree2)) {
+                        if ((subtree1AncestorsSize + subtree2.depth() <= maxDepth) && (Iterables.size(subtree2.getAncestors()) + subtree1Depth <= maxDepth)) {
+                            subtree1.clearParents();
+                            subtree2.clearParents();
+                            Collection<Node<T>> swappingChildren = new ArrayList<>(subtree1);
+                            subtree1.clear();
+                            subtree1.addAll(subtree2);
+                            subtree2.clear();
+
+                            subtree2.addAll(swappingChildren);
+                            done = true;
+                            break;
+                        }
                     }
                 }
                 if (done) {

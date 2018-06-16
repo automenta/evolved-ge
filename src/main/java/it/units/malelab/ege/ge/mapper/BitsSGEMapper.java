@@ -124,7 +124,7 @@ public class BitsSGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
       //add children
       for (Pair<T, Integer> p : options.get(optionIndex)) {
         Node<Pair<T, Integer>> newChild = new Node<>(p);
-          nodeToBeReplaced.children.add(newChild);
+          nodeToBeReplaced.add(newChild);
       }
       expandedSymbols.add(nodeToBeReplaced.content);
     }
@@ -135,8 +135,8 @@ public class BitsSGEMapper<T> extends AbstractMapper<BitsGenotype, T> {
 
   private Node<T> transform(Node<Pair<T, Integer>> pairNode) {
     Node<T> node = new Node<>(pairNode.content.first);
-      for (Node<Pair<T, Integer>> pairChild : pairNode.children) {
-          node.children.add(transform(pairChild));
+      for (Node<Pair<T, Integer>> pairChild : pairNode) {
+          node.add(transform(pairChild));
     }
     return node;
   }

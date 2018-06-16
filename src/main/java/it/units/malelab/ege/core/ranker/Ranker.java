@@ -6,8 +6,10 @@
 package it.units.malelab.ege.core.ranker;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 /**
  *

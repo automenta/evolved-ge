@@ -37,7 +37,7 @@ public class MultipleOutputParallelMultiplier extends Problem<String, NumericFit
                         if (i > 0) {
                             sb.append(':');
                         }
-                        sb.append(BooleanUtils.transform(node.children.get(i)));
+                        sb.append(BooleanUtils.transform(node.get(i)));
                     }
                     return sb.toString();
                 }

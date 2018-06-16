@@ -39,7 +39,7 @@ public class MapperGeneration extends Problem<String, MultiObjectiveFitness<Doub
 
                 @Override
                 public String toString(Node<String> node) {
-                    return innerPhenotypePrinter.toString(node.children.get(0)) + '&' + innerPhenotypePrinter.toString(node.children.get(1));
+                    return innerPhenotypePrinter.toString(node.get(0)) + '&' + innerPhenotypePrinter.toString(node.get(1));
                 }
             }
     );

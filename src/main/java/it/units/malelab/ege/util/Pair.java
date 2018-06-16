@@ -21,8 +21,8 @@ public class Pair<F, S> implements Serializable {
         this.first = first;
         this.second = second;
         int hash = 5;
-        hash = 83 * hash + Objects.hashCode(this.first);
-        hash = 83 * hash + Objects.hashCode(this.second);
+        hash = 83 * hash + this.first.hashCode();
+        hash = 83 * hash + this.second.hashCode();
         this.hash = hash;
     }
 

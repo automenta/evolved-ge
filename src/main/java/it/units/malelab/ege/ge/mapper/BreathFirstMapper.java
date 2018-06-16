@@ -92,7 +92,7 @@ public class BreathFirstMapper<T> extends AbstractMapper<BitsGenotype, T> {
       //add children
       for (T t : options.get(optionIndex)) {
           Node<EnhancedSymbol<T>> newChild = new Node<>(new EnhancedSymbol<>(t, nodeToBeReplaced.content.getDepth() + 1));
-        nodeToBeReplaced.children.add(newChild);
+        nodeToBeReplaced.add(newChild);
       }
       currentCodonIndex = currentCodonIndex+1;
     }
@@ -103,8 +103,8 @@ public class BreathFirstMapper<T> extends AbstractMapper<BitsGenotype, T> {
   
   private Node<T> extractFromEnhanced(Node<EnhancedSymbol<T>> enhancedNode) {
       Node<T> node = new Node<>(enhancedNode.content.getSymbol());
-    for (Node<EnhancedSymbol<T>> enhancedChild : enhancedNode.children) {
-      node.children.add(extractFromEnhanced(enhancedChild));
+    for (Node<EnhancedSymbol<T>> enhancedChild : enhancedNode) {
+      node.add(extractFromEnhanced(enhancedChild));
     }
     return node;
   }

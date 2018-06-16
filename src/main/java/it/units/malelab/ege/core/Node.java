@@ -21,14 +21,29 @@ import static java.util.stream.Collectors.toList;
 
 /**
  * @author eric
+ * stores subnodes as elements of the List it extends
  */
 public class Node<T> extends ArrayList<Node<T>> implements Sequence<T>, Serializable, Iterable<Node<T>> {
 
-    public static final Node EMPTY_TREE = new Node(null);
-    final static Node[] EmptyNodeArray = new Node[0];
+    public static final Node EMPTY_TREE = new Node(null) {
+        @Override
+        public boolean add(Node node) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void add(int index, Node element) {
+            throw new UnsupportedOperationException();
+        }
+    };
+
     public final T content;
-    public final List<Node<T>> children = this;
+
     private Node<T> parent;
+
+    transient private int hash = 0;
+    transient private List<Node<T>> leaves = List.of(this);
+
 
     public Node(T content) {
         this.content = content;
@@ -38,15 +53,24 @@ public class Node<T> extends ArrayList<Node<T>> implements Sequence<T>, Serializ
         this(original != null ? original.content : null);
 
         if (original != null) {
-            //new Node<>(child));
-            addAll(original.children);
+            addAll(original);
         }
     }
 
+    private void changed() {
+        leaves = null;
+        hash = 0;
+    }
+    
     @Override
     public Node<T> set(int index, Node<T> element) {
-        leaves = null;
-        return super.set(index, element);
+        if (element == this)
+            throw new RuntimeException();
+        if (!get(index).equals(element)) {
+            changed();
+            return super.set(index, element);
+        }
+        return element;
     }
 
     public List<Node<T>> leafNodes() {
@@ -69,7 +93,7 @@ public class Node<T> extends ArrayList<Node<T>> implements Sequence<T>, Serializ
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(content);
-        if (!children.isEmpty()) {
+        if (!isEmpty()) {
             sb.append('{');
             for (Node<T> child: this) {
                 sb.append(child).append(',');
@@ -96,15 +120,19 @@ public class Node<T> extends ArrayList<Node<T>> implements Sequence<T>, Serializ
     }
 
     public void propagateParentship() {
-        for (Node<T> child: children) {
-            child.parent = this;
-            child.propagateParentship();
+        for (int i = 0, childrenSize = size(); i < childrenSize; i++) {
+            Node<T> child = get(i);
+            if (child.parent != this) {
+                child.parent = this;
+                child.propagateParentship();
+            }
         }
     }
 
     public int depth() {
         int max = 0;
-        for (Node<T> child: children) {
+        for (int i = 0, childrenSize = size(); i < childrenSize; i++) {
+            Node<T> child = get(i);
             max = Math.max(max, child.depth());
         }
         return max + 1;
@@ -112,18 +140,26 @@ public class Node<T> extends ArrayList<Node<T>> implements Sequence<T>, Serializ
 
     public int nodeSize() {
         int size = 0;
-        for (Node<T> child: children) {
+        for (int i = 0, childrenSize = size(); i < childrenSize; i++) {
+            Node<T> child = get(i);
             size = size + child.nodeSize();
         }
         return size + 1;
     }
 
     @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 53 * hash + content.hashCode();
-        hash = 53 * hash + super.hashCode();
-        return hash;
+    public final int hashCode() {
+        int h = hash;
+        if (h == 0) {
+            int hash = 53 + (content!=null ? content.hashCode() : 0);
+            int s = size();
+            for (int i = 0; i < s; i++) {
+                hash = 53 * hash + get(i).hashCode();
+            }
+            if (hash == 0) hash =1;
+            return this.hash = hash;
+        }
+        return h;
     }
 
     @Override
@@ -132,10 +168,13 @@ public class Node<T> extends ArrayList<Node<T>> implements Sequence<T>, Serializ
             return true;
         if (!(obj instanceof Node))
             return false;
+
 //        if (getClass() != obj.getClass()) {
 //            return false;
 //        }
         final Node<?> other = (Node<?>) obj;
+        if (hashCode()!=other.hashCode())
+            return false;
         if (!Objects.equals(this.content, other.content)) {
             return false;
         }
@@ -179,26 +218,28 @@ public class Node<T> extends ArrayList<Node<T>> implements Sequence<T>, Serializ
 
 
 
-        /**
-         * cached leaf nodes
-         */
-        private List<Node<T>> leaves = List.of(this);
-
         @Override
         public boolean add(Node<T> tNode) {
-            leaves = null;
+            if (tNode == this || (tNode.parent!=null && tNode.parent!=this))
+                tNode = new Node(tNode); //clone
+            changed();
             return super.add(tNode);
         }
 
         @Override
         public boolean remove(Object tNode) {
-            leaves = null;
-            return super.remove(tNode);
+            if (super.remove(tNode)) {
+                changed();
+                return true;
+            }
+            return false;
         }
 
         @Override
         public void add(int index, Node<T> element) {
-            leaves = null;
+            if (element == this)
+                throw new RuntimeException();
+            changed();
             super.add(index, element);
         }
 
@@ -206,46 +247,75 @@ public class Node<T> extends ArrayList<Node<T>> implements Sequence<T>, Serializ
 
         @Override
         public boolean addAll(int index, Collection<? extends Node<T>> c) {
-            leaves = null;
-            return super.addAll(index, c);
+            throw new UnsupportedOperationException("TODO");
         }
 
         @Override
         protected void removeRange(int fromIndex, int toIndex) {
-            leaves = null;
+            changed();
             super.removeRange(fromIndex, toIndex);
         }
 
         @Override
         public Node<T> remove(int index) {
-            leaves = null;
+            changed();
             return super.remove(index);
         }
 
         @Override
         public boolean addAll(Collection<? extends Node<T>> c) {
-            leaves = null;
-            return super.addAll(c);
+            if (c == this) {
+                int s = size();
+                for (int i = 0; i < s; i++) {
+                    add(get(i));
+                }
+                changed();
+                return true;
+            }
+            int sizeBefore = 0;
+            c.forEach(this::add);
+            if (size()> sizeBefore) {
+                changed();
+                return true;
+            } return false;
         }
 
         @Override
         public boolean removeAll(Collection<?> c) {
-            leaves = null;
-            return super.removeAll(c);
+            if (c == this) {
+                clear();
+                return true;
+            }
+            if (super.removeAll(c)) {
+                changed();
+                return true;
+            }
+            return false;
         }
 
         @Override
         public boolean removeIf(Predicate<? super Node<T>> filter) {
-            leaves = null;
-            return super.removeIf(filter);
+
+            if (super.removeIf(filter)) {
+                changed();
+                return true;
+            }
+            return false;
         }
 
         @Override
         public void clear() {
-            leaves = null;
-            super.clear();
+            if (size() > 0) {
+                super.clear();
+                changed();
+            }
         }
 
 
-
+    public void clearParents() {
+        for (int i = 0, thisSize = this.size(); i < thisSize; i++) {
+            Node n = this.get(i);
+            n.parent = null;
+        }
+    }
 }

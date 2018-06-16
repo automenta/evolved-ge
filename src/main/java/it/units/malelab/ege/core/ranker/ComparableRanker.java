@@ -5,7 +5,11 @@
  */
 package it.units.malelab.ege.core.ranker;
 
+import com.google.common.collect.Lists;
+
 import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * @author eric
@@ -20,17 +24,21 @@ public class ComparableRanker<T> implements Ranker<T> {
 
     @Override
     public List<List<T>> rank(List<T> individuals, Random random) {
-        List<List<T>> ranks = new ArrayList<>();
-        individuals.sort(comparator);
-        ranks.add(new ArrayList<>(List.of(individuals.get(0))));
-        for (int i = 1; i < individuals.size(); i++) {
-            if (comparator.compare(individuals.get(i - 1), individuals.get(i)) < 0) {
-                ranks.add(new ArrayList<>(List.of(individuals.get(i))));
-            } else {
-                ranks.get(ranks.size() - 1).add(individuals.get(i));
-            }
-        }
-        return ranks;
+        List<T> x = individuals.stream().distinct().collect(toList());
+        x.sort(comparator);
+        return List.of(x);
+
+//        new HashSet<>();
+//        individuals.sort(comparator);
+//        ranks.add(new ArrayList<>(List.of(individuals.get(0))));
+//        for (int i = 1; i < individuals.size(); i++) {
+//            if (comparator.compare(individuals.get(i - 1), individuals.get(i)) < 0) {
+//                ranks.add(new ArrayList<>(List.of(individuals.get(i))));
+//            } else {
+//                ranks.get(ranks.size() - 1).add(individuals.get(i));
+//            }
+//        }
+//        return ranks;
     }
 
 }

@@ -41,13 +41,13 @@ public class KLandscapesTest {
     w.put(new Pair<>("n1", "t1"), 0.8);
     tree1 = new Node<>("t0");
     tree2 = new Node<>("n0");
-    tree2.children.add(new Node<>("t0"));
-    tree2.children.add(new Node<>("t1"));
+    tree2.add(new Node<>("t0"));
+    tree2.add(new Node<>("t1"));
     tree3 = new Node<>("n0");
-    tree3.children.add(new Node<>("t0"));
-    tree3.children.add(new Node<>("n1"));
-    tree3.children.get(1).children.add(new Node<>("t0"));
-    tree3.children.get(1).children.add(new Node<>("t1"));
+    tree3.add(new Node<>("t0"));
+    tree3.add(new Node<>("n1"));
+    tree3.get(1).add(new Node<>("t0"));
+    tree3.get(1).add(new Node<>("t1"));
   }
 
   @Test
@@ -104,7 +104,7 @@ public class KLandscapesTest {
           for (Node<String> rigthChild : subtrees) {
             Node<String> node = new Node<>("n" + i);
               ( node).add(leftChild);
-              node.children.add(rigthChild);
+              node.add(rigthChild);
             all.add(node);
           }
         }
@@ -118,12 +118,12 @@ public class KLandscapesTest {
     int[] indexes = new int[]{0, 1, 2};
     int arity = 2;
     Node<String> t = new Node<>("n0");
-      t.children.add(new Node<>("n1"));
-      t.children.add(new Node<>("n1"));
-      t.children.get(0).children.add(new Node<>("t2"));
-      t.children.get(0).add(new Node<>("t2"));
-    ( t).get(1).children.add(new Node<>("t2"));
-    ( t).get(1).children.add(new Node<>("t2"));
+      t.add(new Node<>("n1"));
+      t.add(new Node<>("n1"));
+      t.get(0).add(new Node<>("t2"));
+      t.get(0).add(new Node<>("t2"));
+    ( t).get(1).add(new Node<>("t2"));
+    ( t).get(1).add(new Node<>("t2"));
     Node<String> result = KLandscapes.levelEqualTree(indexes, arity);
     assertEquals("Tree should be " + t, t, result);
   }
@@ -132,10 +132,10 @@ public class KLandscapesTest {
   public void testMaxFK() {
     Collection<Node<String>> subtrees = new ArrayList<>();
     subtrees.add(tree3);
-    subtrees.add(tree3.children.get(0));
-    subtrees.add(tree3.children.get(1));
-    subtrees.add(( tree3).get(1).children.get(0));
-    subtrees.add(tree3.children.get(1).children.get(1));
+    subtrees.add(tree3.get(0));
+    subtrees.add(tree3.get(1));
+    subtrees.add(( tree3).get(1).get(0));
+    subtrees.add(tree3.get(1).get(1));
     for (int k = 0; k < 5; k++) {
       double maxFk = Double.NEGATIVE_INFINITY;
       for (Node<String> subtree : subtrees) {

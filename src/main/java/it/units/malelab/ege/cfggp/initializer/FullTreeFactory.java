@@ -59,7 +59,7 @@ public class FullTreeFactory<T> extends GrowTreeFactory<T> {
         if (child == null) {
           return null;
         }
-          tree.children.add(child);
+          tree.add(child);
       }
     }
     return tree;

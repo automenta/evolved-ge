@@ -23,9 +23,9 @@ public class Triplet<F, S, T>  {
     this.second = second;
     this.third = third;
     int hash = 5;
-    hash = 83 * hash + Objects.hashCode(this.first);
-    hash = 83 * hash + Objects.hashCode(this.second);
-    hash = 67 * hash + Objects.hashCode(this.third);
+    hash = 83 * hash + this.first.hashCode();
+    hash = 83 * hash + this.second.hashCode();
+    hash = 67 * hash + this.third.hashCode();
     this.hash = hash;
   }
 

@@ -100,7 +100,7 @@ public class SGEMapper<T> extends AbstractMapper<SGEGenotype<T>, T> {
             //add children
             for (Pair<T, Integer> symbol: options.get(value)) {
                 Node<Pair<T, Integer>> newChild = new Node<>(symbol);
-                nodeToBeReplaced.children.add(newChild);
+                nodeToBeReplaced.add(newChild);
             }
             expandedSymbols.add(nodeToBeReplaced.content);
         }
@@ -110,7 +110,7 @@ public class SGEMapper<T> extends AbstractMapper<SGEGenotype<T>, T> {
 
     private Node<T> transform(Node<Pair<T, Integer>> pairNode) {
         Node<T> node = new Node<>(pairNode.content.first);
-        for (Node<Pair<T, Integer>> pairChild: pairNode.children) {
+        for (Node<Pair<T, Integer>> pairChild: pairNode) {
             ((List<Node<T>>) node).add(transform(pairChild));
         }
         return node;

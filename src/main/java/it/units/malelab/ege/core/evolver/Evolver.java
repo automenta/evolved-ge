@@ -20,6 +20,8 @@ import java.util.concurrent.ExecutorService;
 public interface Evolver<G, T, F extends Fitness> {
   
   Configuration<G, T, F> getConfiguration();
+
+  //should be Set<>
   List<Node<T>> solve(
           ExecutorService executor,
           Random random,

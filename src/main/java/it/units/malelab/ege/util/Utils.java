@@ -100,7 +100,7 @@ public class Utils {
                 break;
             }
             //look for this non-terminal in the tree
-            Iterable<Pair<T, Integer>> decoratedSymbols = contents(findNodeWithContent(decoratedTree, toFillDecoratedNonTerminal).children);
+            Iterable<Pair<T, Integer>> decoratedSymbols = contents(findNodeWithContent(decoratedTree, toFillDecoratedNonTerminal));
             Map<T, Pair<T, Integer>> map = new LinkedHashMap<>();
             for (Pair<T, Integer> pair: decoratedSymbols) {
                 map.put(pair.first, pair);
@@ -177,8 +177,8 @@ public class Utils {
 
     private static <T> Node<Pair<T, Integer>> decorateTreeWithDepth(Node<T> tree) {
         Node<Pair<T, Integer>> decoratedTree = new Node<>(new Pair<>(tree.content, Iterables.size(tree.getAncestors())));
-        for (Node<T> child: tree.children) {
-            decoratedTree.children.add(decorateTreeWithDepth(child));
+        for (Node<T> child: tree) {
+            decoratedTree.add(decorateTreeWithDepth(child));
         }
         return decoratedTree;
     }
@@ -204,7 +204,7 @@ public class Utils {
 
     private static <T> void prettyPrintTree(Node<T> node, PrintStream ps) {
         ps.printf("%" + (1 + Iterables.size(node.getAncestors()) * 2) + "s-%s%n", "", node.content);
-        for (Node<T> child: node.children) {
+        for (Node<T> child: node) {
             prettyPrintTree(child, ps);
         }
     }
@@ -220,7 +220,11 @@ public class Utils {
     public static <T> List<T> getAll(Iterable<Future<List<T>>> futures) throws InterruptedException, ExecutionException {
         List<T> results = new ArrayList<>();
         for (Future<List<T>> future: futures) {
-            results.addAll(future.get());
+            if (future!=null) {
+                List<T> f = future.get();
+                if (f != null)
+                    results.addAll(f);
+            }
         }
         return results;
     }
@@ -338,13 +342,13 @@ public class Utils {
         }
         //validate node children sequence (option)
         List<T> childContents = new ArrayList<>();
-        for (Node<T> child: tree.children) {
+        for (Node<T> child: tree) {
             childContents.add(child.content);
         }
         if (!grammar.get(tree.content).contains(childContents)) {
             return false;
         }
-        for (Node<T> child: tree.children) {
+        for (Node<T> child: tree) {
             if (!innerValidate(child, grammar, terminals)) {
                 return false;
             }
@@ -397,7 +401,7 @@ public class Utils {
 
     public static <T> Node<T> node(T t, Node<T>... children) {
         Node<T> n = new Node<>(t);
-        Collections.addAll(n.children, children);
+        Collections.addAll(n, children);
         return n;
     }
 

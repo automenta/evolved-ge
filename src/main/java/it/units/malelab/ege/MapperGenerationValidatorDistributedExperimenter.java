@@ -64,7 +64,7 @@ public final class MapperGenerationValidatorDistributedExperimenter extends Mapp
       s.append(t.content.replaceAll("_", "."));
     }
     s.append("}}");
-      for (Node<String> child : t.children) {
+      for (Node<String> child : t) {
       s.append('\n').append(ps(child, d + 1));
     }
     s.append(" ]");
@@ -88,8 +88,8 @@ public final class MapperGenerationValidatorDistributedExperimenter extends Mapp
   public void start() throws IOException {
 
     //System.out.println(ps(getGERawTree(), 0));
-      System.out.println(pe(MapperUtils.transform(getWHGERawTree().children.get(0)), 0));
-      System.out.println(pe(MapperUtils.transform(getWHGERawTree().children.get(1)), 0));
+      System.out.println(pe(MapperUtils.transform(getWHGERawTree().get(0)), 0));
+      System.out.println(pe(MapperUtils.transform(getWHGERawTree().get(1)), 0));
     System.exit(0);
 
     //baseline jobs
